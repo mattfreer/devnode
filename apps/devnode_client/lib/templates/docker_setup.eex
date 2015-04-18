@@ -1,0 +1,12 @@
+# stop docker
+sudo service docker stop
+
+# In docker upstart conf file, change line that includes: 'exec "$DOCKER"'
+# to pass `insecure-registry` option to docker binary
+sudo sed -i "/exec \"\$DOCKER\"/c\exec \"\$DOCKER\" -d \$DOCKER_OPTS --insecure-registry <%= registry %>" /etc/init/docker.conf
+
+# start docker
+sudo service docker start
+
+# Pull docker images specified in fig file
+cd /scripts/ && sudo fig pull --allow-insecure-ssl
