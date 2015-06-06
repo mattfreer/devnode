@@ -1,7 +1,6 @@
 defmodule Devnode.Client.Scaffold do
   require EEx
 
-  @vm_ip "192.168.124.124"
   @vm_memory 1024
   @registry "192.168.10.10:5000"
 
@@ -19,10 +18,10 @@ defmodule Devnode.Client.Scaffold do
     [:registry]
   )
 
-  def build(path) do
+  def build(path, name) do
     create_dirs(path)
     env_path(path) |> copy_static_files
-    env_path(path) |> create_vagrantfile
+    env_path(path) |> create_vagrantfile(name)
     recipes_path(path) |> create_docker_setup
   end
 
@@ -40,13 +39,13 @@ defmodule Devnode.Client.Scaffold do
     path <> "/env/recipes"
   end
 
-  defp create_vagrantfile(path) do
+  defp create_vagrantfile(path, name) do
+    template = Devnode.Client.Node.new(name)
+    |> Map.get(:ip)
+    |> vagrantfile_template(@vm_memory, ["app", "scripts"])
+
     file = path <> "/Vagrantfile"
-    File.write(file, vagrantfile_template(
-      @vm_ip,
-      @vm_memory,
-      ["app", "scripts"]
-    ))
+    File.write(file, template)
   end
 
   defp create_docker_setup(path) do

@@ -3,58 +3,81 @@ defmodule Devnode.Client.ScaffoldTest do
   alias Devnode.Client.Support.TestDir, as: TestDir
   alias Devnode.Client.Scaffold, as: Scaffold
   import Devnode.Client.Support.Assertions
+  import Mock
 
   setup do
-    path = TestDir.mk_sub_dir("a")
-
     on_exit fn ->
       TestDir.remove
     end
 
-    {:ok, project_path: path}
+    test_project = %{
+      path: TestDir.mk_sub_dir("a"),
+      name: "test project"
+    }
+
+    {:ok, project: test_project}
   end
 
-  test "it creates a app folder in the project path", %{project_path: project_path} do
-    dir = project_path <> "/app"
-
-    Scaffold.build(project_path)
-    assert File.dir?(dir) == true
+  def with_node_mock(fun) do
+    with_mock Devnode.Client.Node, [:passthrough], [new: fn(name) -> %{name: "my node", ip: "192.100.100.100"} end] do
+      fun.()
+    end
   end
 
-  test "it creates a env folder in the project path", %{project_path: project_path} do
-    dir = project_path <> "/env"
-
-    Scaffold.build(project_path)
-    assert File.dir?(dir) == true
+  test "#build creates a app folder in the project path", %{project: project} do
+    with_node_mock(fn() ->
+      dir = project.path <> "/app"
+      Scaffold.build(project.path, project.name)
+      assert File.dir?(dir) == true
+    end)
   end
 
-  test "it creates a Vagrantfile in the env directory", %{project_path: project_path} do
-    file = project_path <> "/env/Vagrantfile"
-    Scaffold.build(project_path)
-    assert File.exists?(file) == true
+  test "#build creates a env folder in the project path", %{project: project} do
+    with_node_mock(fn() ->
+      dir = project.path <> "/env"
+
+      Scaffold.build(project.path, project.name)
+      assert File.dir?(dir) == true
+    end)
   end
 
-  test "it creates a Vagrantfile with expected content", %{project_path: project_path} do
-    file = project_path <> "/env/Vagrantfile"
-    Scaffold.build(project_path)
-    assert_file_content(File.read(file) |> elem(1), "vagrant_file.txt")
+  test "#build creates a Vagrantfile in the env directory", %{project: project} do
+    with_node_mock(fn() ->
+      file = project.path <> "/env/Vagrantfile"
+      Scaffold.build(project.path, project.name)
+      assert File.exists?(file) == true
+    end)
   end
 
-  test "it creates a bootstrap.sh file in the env directory", %{project_path: project_path} do
-    file = project_path <> "/env/bootstrap.sh"
-    Scaffold.build(project_path)
-    assert File.exists?(file) == true
+  test "#build creates a Vagrantfile with expected content", %{project: project} do
+    with_node_mock(fn() ->
+      file = project.path <> "/env/Vagrantfile"
+      Scaffold.build(project.path, project.name)
+      assert_file_content(File.read(file) |> elem(1), "vagrant_file.txt")
+    end)
   end
 
-  test "it creates a docker_setup.sh file in the env/recipes directory", %{project_path: project_path} do
-    file = project_path <> "/env/recipes/docker_setup.sh"
-    Scaffold.build(project_path)
-    assert File.exists?(file) == true
+  test "#build creates a bootstrap.sh file in the env directory", %{project: project} do
+    with_node_mock(fn() ->
+      file = project.path <> "/env/bootstrap.sh"
+      Scaffold.build(project.path, project.name)
+      assert File.exists?(file) == true
+    end)
   end
 
-  test "it creates a docker_setup.sh file in env/recipes directory with expected content", %{project_path: project_path} do
-    file = project_path <> "/env/recipes/docker_setup.sh"
-    Scaffold.build(project_path)
-    assert_file_content(File.read(file) |> elem(1), "docker_setup.txt")
+  test "#build creates a docker_setup.sh file in the env/recipes directory", %{project: project} do
+    with_node_mock(fn() ->
+      file = project.path <> "/env/recipes/docker_setup.sh"
+      Scaffold.build(project.path, project.name)
+      assert File.exists?(file) == true
+    end)
+  end
+
+  test "#build creates a docker_setup.sh file in env/recipes directory with expected content", %{project: project} do
+    with_node_mock(fn() ->
+      file = project.path <> "/env/recipes/docker_setup.sh"
+      Scaffold.build(project.path, project.name)
+      assert_file_content(File.read(file) |> elem(1), "docker_setup.txt")
+    end)
   end
 end
