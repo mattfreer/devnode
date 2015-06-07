@@ -2,12 +2,19 @@ defmodule Devnode.Client.Mixfile do
   use Mix.Project
 
   def project do
-    [app: :devnode_client,
-     version: "0.0.1",
-     deps_path: "../../deps",
-     lockfile: "../../mix.lock",
-     elixir: "~> 1.0",
-     deps: deps]
+    [
+      app: :devnode_client,
+      version: "0.0.1",
+      escript: escript,
+      deps_path: "../../deps",
+      lockfile: "../../mix.lock",
+      elixir: "~> 1.0",
+      deps: deps
+    ]
+  end
+
+  defp escript do
+    [main_module: Devnode.Client.CLI, embed_elixir: true]
   end
 
   # Configuration for the OTP application
