@@ -19,7 +19,7 @@ defmodule Devnode.ClientTest do
 
   test "#start connects to monitor node" do
     with_mock Devnode.Client, [:passthrough], [client_name: fn -> :"foo@bar" end] do
-      with_mock Node, [:passthrough], [connect: fn(node) -> true end] do
+      with_mock Node, [:passthrough], [connect: fn(_node) -> true end] do
         Devnode.Client.start
         assert called Node.connect(:"dnmonitor@127.0.0.1")
       end
