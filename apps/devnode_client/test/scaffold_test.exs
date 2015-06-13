@@ -24,6 +24,13 @@ defmodule Devnode.Client.ScaffoldTest do
     end
   end
 
+  test "#build returns node credentials Map", %{project: project} do
+    with_node_mock(fn() ->
+      expected = Scaffold.build(project.path, project.name)
+      assert expected == %{ip: "192.100.100.100", name: "my node"}
+    end)
+  end
+
   test "#build creates a app folder in the project path", %{project: project} do
     with_node_mock(fn() ->
       dir = project.path <> "/app"

@@ -19,10 +19,14 @@ defmodule Devnode.Client.Scaffold do
   )
 
   def build(path, name) do
+    credentials = Devnode.Client.Node.new(name)
     create_dirs(path)
+
     env_path(path) |> copy_static_files
-    env_path(path) |> create_vagrantfile(name)
+    env_path(path) |> create_vagrantfile(credentials)
     recipes_path(path) |> create_docker_setup
+
+    credentials
   end
 
   defp create_dirs(path) do
@@ -39,8 +43,8 @@ defmodule Devnode.Client.Scaffold do
     path <> "/env/recipes"
   end
 
-  defp create_vagrantfile(path, name) do
-    template = Devnode.Client.Node.new(name)
+  defp create_vagrantfile(path, credentials) do
+    template = credentials
     |> Map.get(:ip)
     |> vagrantfile_template(@vm_memory, ["app", "scripts"])
 

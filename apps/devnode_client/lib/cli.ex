@@ -14,11 +14,13 @@ defmodule Devnode.Client.CLI do
   end
 
   defp get_options(argv) do
-    OptionParser.parse(argv)
+    switches = [name: :string]
+    aliases = [n: :name]
+    OptionParser.parse(argv, switches: switches, aliases: aliases)
   end
 
   defp build_response(options) do
-    Devnode.Client.Command.execute(elem(options, 1))
+    Devnode.Client.Command.execute(options)
   end
 
   defp respond(device \\ :erlang.group_leader(), response) do
