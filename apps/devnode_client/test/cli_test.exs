@@ -23,9 +23,9 @@ defmodule Devnode.CLI.Test do
     {:ok, nodes: nodes, test_project: test_project}
   end
 
-  defp with_build_mocks(project, fun) do
+  defp with_build_mocks(options, fun) do
     with_mock Devnode.Client.FileHelper, [:passthrough], [
-      cwd: fn -> Map.get(project, :path) end] do
+      cwd: fn -> Map.get(options.project, :path) end] do
 
       with_mock Devnode.Client.Node, [:passthrough], [
         new: fn(name) -> %{name: name, ip: "192.100.100.100"} end] do
@@ -60,7 +60,7 @@ defmodule Devnode.CLI.Test do
   end
 
   test "build returns new node credentials", %{test_project: project} do
-    with_build_mocks(project, fn ->
+    with_build_mocks(%{project: project}, fn ->
       argv = ["build", "-n=my_node_name"]
       expected = "192.100.100.100    my_node_name"
       assert Devnode.Client.CLI.main(argv) == expected
@@ -68,7 +68,7 @@ defmodule Devnode.CLI.Test do
   end
 
   test "build scaffolds project", %{test_project: project} do
-    with_build_mocks(project, fn ->
+    with_build_mocks(%{project: project}, fn ->
       argv = ["build", "-n=my_node_name"]
       Devnode.Client.CLI.main(argv)
 
