@@ -24,8 +24,13 @@ defmodule Devnode.Monitor.NodeServer do
   end
 
   # Server
-  def init(_)do
-    {:ok, new_list}
+  def init(_) do
+    state = case Devnode.Monitor.NodeStash.read do
+      {:error, _} -> new_list
+      {:ok, value} -> value
+    end
+
+    {:ok, state}
   end
 
   def handle_call({:add_entry, new_entry}, _pid, node_list) do
@@ -33,7 +38,7 @@ defmodule Devnode.Monitor.NodeServer do
 
     case new_state do
       e = {:error, _} -> {:reply, e, node_list}
-      _result -> {:reply, NodeList.get(new_state, new_entry.name) , new_state}
+      _ -> entry_added(new_state, new_entry)
     end
   end
 
@@ -42,6 +47,17 @@ defmodule Devnode.Monitor.NodeServer do
   end
 
   def handle_cast(:purge, _node_list) do
-    {:noreply, new_list}
+    list = new_list
+    persist(list)
+    {:noreply, list}
+  end
+
+  defp entry_added(new_state, new_entry) do
+    persist(new_state)
+    {:reply, NodeList.get(new_state, new_entry.name) , new_state}
+  end
+
+  defp persist(state) do
+    Devnode.Monitor.NodeStash.write(state)
   end
 end

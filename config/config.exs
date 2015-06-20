@@ -24,7 +24,7 @@ use Mix.Config
 #     import_config "#{Mix.env}.exs"
 # This file is responsible for configuring your application
 # and its dependencies with the aid of the Mix.Config module.
-use Mix.Config
+#use Mix.Config
 
 # The configuration defined here will only affect the dependencies
 # in the apps directory when commands are executed from the umbrella

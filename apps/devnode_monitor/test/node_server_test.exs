@@ -1,10 +1,15 @@
 defmodule Devnode.Monitor.NodeSereverTest do
   use ExUnit.Case
-  alias Devnode.Monitor.NodeServer, as: NodeServer
+  alias Devnode.Monitor.NodeServer
+  alias Devnode.Support.TestDir
 
   setup do
     pid = :global.whereis_name(NodeServer)
-    NodeServer.purge(pid)
+
+    on_exit fn ->
+      NodeServer.purge(pid)
+      TestDir.remove
+    end
 
     :ok
   end
@@ -19,6 +24,20 @@ defmodule Devnode.Monitor.NodeSereverTest do
     Process.exit(pid1, :kill)
     :timer.sleep 1000
     assert pid1 != :global.whereis_name(NodeServer)
+  end
+
+  test "when server is restarted it maintains state" do
+    pid = :global.whereis_name(NodeServer)
+    NodeServer.add_entry(pid, "a", "foo")
+    NodeServer.add_entry(pid, "b", "bar")
+
+    GenServer.cast(pid, :bad_cast)
+    :timer.sleep 1000
+
+    pid1 = :global.whereis_name(NodeServer)
+    nodes = NodeServer.entries(pid1)
+    assert %HashDict{} = nodes
+    assert ["a", "b"] = HashDict.keys(nodes)
   end
 
   test "new nodes are named and added to GenServer state" do
