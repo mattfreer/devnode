@@ -1,6 +1,8 @@
 defmodule Devnode.CLI.Test do
   use ExUnit.Case
   alias Devnode.Client.Support.TestDir, as: TestDir
+  alias Devnode.Client.Support.FakeImageRepo
+  alias Devnode.Client.ImageRepo
   import Devnode.Client.Support.Assertions
   import Mock
 
@@ -20,7 +22,12 @@ defmodule Devnode.CLI.Test do
       bar: %{ip: "192.169.100.101", name: "bar"}
     ], HashDict.new
 
-    {:ok, nodes: nodes, test_project: test_project}
+    {
+      :ok,
+      nodes: nodes,
+      test_project: test_project,
+      image_repo: FakeImageRepo.build
+    }
   end
 
   defp with_build_mocks(options, fun) do
@@ -30,7 +37,11 @@ defmodule Devnode.CLI.Test do
       with_mock Devnode.Client.Node, [:passthrough], [
         new: fn(name) -> %{name: name, ip: "192.100.100.100"} end] do
 
-        fun.()
+        with_mock ImageRepo, [:passthrough], [ dir: fn -> options.image_repo end] do
+          with_mock IO, [:passthrough], [ gets: fn(msg) -> options.image end] do
+            fun.()
+          end
+        end
       end
     end
   end
@@ -59,16 +70,23 @@ defmodule Devnode.CLI.Test do
     end
   end
 
-  test "build returns new node credentials", %{test_project: project} do
-    with_build_mocks(%{project: project}, fn ->
+  test "build returns new node credentials, when valid image is selected", %{test_project: project, image_repo: image_repo} do
+    with_build_mocks(%{project: project, image_repo: image_repo, image: "a_env"}, fn ->
       argv = ["build", "-n=my_node_name"]
       expected = "192.100.100.100    my_node_name"
       assert Devnode.Client.CLI.main(argv) == expected
     end)
   end
 
-  test "build scaffolds project", %{test_project: project} do
-    with_build_mocks(%{project: project}, fn ->
+  test "build returns nil, when invalid image is selected", %{test_project: project, image_repo: image_repo} do
+    with_build_mocks(%{project: project, image_repo: image_repo, image: "invalid"}, fn ->
+      argv = ["build", "-n=my_node_name"]
+      assert Devnode.Client.CLI.main(argv) == nil
+    end)
+  end
+
+  test "build scaffolds project, when valid image is selected", %{test_project: project, image_repo: image_repo} do
+    with_build_mocks(%{project: project, image_repo: image_repo, image: "c_env"}, fn ->
       argv = ["build", "-n=my_node_name"]
       Devnode.Client.CLI.main(argv)
 
@@ -81,6 +99,16 @@ defmodule Devnode.CLI.Test do
 
       file_content(project, "/env/recipes/docker_setup.sh")
       |> assert_file_content("docker_setup.txt")
+    end)
+  end
+
+  test "build doesn't scaffold the project, when invalid image is selected", %{test_project: project, image_repo: image_repo} do
+    with_build_mocks(%{project: project, image_repo: image_repo, image: "invalid"}, fn ->
+      argv = ["build", "-n=my_node_name"]
+      Devnode.Client.CLI.main(argv)
+
+      assert File.dir?(project.path <> "/app") == false
+      assert File.dir?(project.path <> "/env") == false
     end)
   end
 end
