@@ -35,10 +35,13 @@ defmodule Devnode.Client.Command do
     images = ImageRepo.list(ImageRepo.dir)
 
     if(Enum.member?(images, image_selection(images))) do
-      name = Keyword.get(values, :name)
-      credentials = Scaffold.build(FileHelper.cwd, name)
-      "#{ Map.get(credentials, :ip) }    #{ Map.get(credentials, :name) }"
+      scaffold_node(Keyword.get(values, :name))
     end
+  end
+
+  defp scaffold_node(name) when byte_size(name) > 0 do
+    credentials = Scaffold.build(FileHelper.cwd, name)
+    "#{ Map.get(credentials, :ip) }    #{ Map.get(credentials, :name) }"
   end
 
   defp image_selection(images) do

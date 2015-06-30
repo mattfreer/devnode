@@ -20,7 +20,16 @@ defmodule Devnode.Client.CLI do
   end
 
   defp build_response(options) do
-    Devnode.Client.Command.execute(options)
+    Process.flag(:trap_exit, true)
+
+    %Task{pid: pid, ref: ref} = Task.async(fn ->
+      {:result, Devnode.Client.Command.execute(options)}
+    end)
+
+    receive do
+      {:EXIT, pid, _ } -> Devnode.Client.Help.msg(elem(options,1))
+      {ref, {:result, data}} -> data
+    end
   end
 
   defp respond(device \\ :erlang.group_leader(), response) do

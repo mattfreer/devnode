@@ -70,6 +70,13 @@ defmodule Devnode.CLI.Test do
     end
   end
 
+  test "build returns help content if no name is specfied", %{test_project: project, image_repo: image_repo} do
+    with_build_mocks(%{project: project, image_repo: image_repo, image: "a_env"}, fn ->
+      argv = ["build"]
+      assert Devnode.Client.CLI.main(argv) == "The `build` command should be used as follows:\nbuild --name=node_name\n"
+    end)
+  end
+
   test "build returns new node credentials, when valid image is selected", %{test_project: project, image_repo: image_repo} do
     with_build_mocks(%{project: project, image_repo: image_repo, image: "a_env"}, fn ->
       argv = ["build", "-n=my_node_name"]
