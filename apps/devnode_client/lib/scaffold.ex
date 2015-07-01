@@ -3,25 +3,26 @@ defmodule Devnode.Client.Scaffold do
 
   @vm_memory 1024
   @registry "192.168.10.10:5000"
+  @templates "lib/templates"
 
   EEx.function_from_file(
     :def,
     :vagrantfile_template,
-    "lib/templates/vagrant_file.eex",
+    Path.expand("vagrant_file.eex", @templates),
     [:ip, :memory, :shared_dirs]
   )
 
   EEx.function_from_file(
     :def,
     :docker_setup_template,
-    "lib/templates/docker_setup.eex",
+    Path.expand("docker_setup.eex", @templates),
     [:registry]
   )
 
   EEx.function_from_file(
     :def,
     :fig_template,
-    "lib/templates/fig.eex",
+    Path.expand("fig.eex", @templates),
     [:image, :registry, :shared_dirs]
   )
 
@@ -44,15 +45,15 @@ defmodule Devnode.Client.Scaffold do
   end
 
   defp env_path(project_path) do
-    project_path <> "/env"
+    Path.expand("env", project_path)
   end
 
   defp scripts_path(project_path) do
-    project_path <> "/scripts"
+    Path.expand("scripts", project_path)
   end
 
-  defp recipes_path(path) do
-    path <> "/env/recipes"
+  defp recipes_path(project_path) do
+    Path.expand("env/recipes", project_path)
   end
 
   defp create_vagrantfile(path, credentials) do
@@ -60,8 +61,8 @@ defmodule Devnode.Client.Scaffold do
     |> Map.get(:ip)
     |> vagrantfile_template(@vm_memory, ["app", "scripts"])
 
-    file = path <> "/Vagrantfile"
-    File.write(file, template)
+    Path.expand("Vagrantfile", path)
+    |> File.write(template)
   end
 
   defp create_fig_config(path, credentials) do
@@ -69,15 +70,16 @@ defmodule Devnode.Client.Scaffold do
     |> Map.get(:image)
     |> fig_template(@registry, ["app", "scripts"])
 
-    File.write(Path.expand("fig.yml", path), template)
+    Path.expand("fig.yml", path)
+    |> File.write(template)
   end
 
   defp create_docker_setup(path) do
-    file = path <> "/docker_setup.sh"
-    File.write(file, docker_setup_template(@registry))
+    Path.expand("docker_setup.sh", path)
+    |> File.write(docker_setup_template(@registry))
   end
 
   defp copy_static_files(path) do
-    File.copy("lib/templates/bootstrap.sh", path <> "/bootstrap.sh")
+    File.copy("lib/templates/bootstrap.sh", Path.expand("bootstrap.sh", path))
   end
 end
