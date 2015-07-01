@@ -1,0 +1,8 @@
+web:
+  image: <%= registry %>/<%= image %>
+  volumes:
+<%= Enum.map shared_dirs, fn(dir) -> %>
+    - /<%= dir %>:/<%= dir %>
+<%= end %>
+  ports:
+    - "4232:22"

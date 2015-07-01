@@ -7,8 +7,8 @@ defmodule Devnode.Monitor.NodeServer do
     GenServer.start_link(__MODULE__, nil, name: {:global, __MODULE__})
   end
 
-  def add_entry(node_server, name) do
-    GenServer.call(node_server, {:add_entry, %{name: name}})
+  def add_entry(node_server, name, image) do
+    GenServer.call(node_server, {:add_entry, %{name: name, image: image}})
   end
 
   def entries(node_server) do

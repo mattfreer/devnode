@@ -18,12 +18,20 @@ defmodule Devnode.Client.Scaffold do
     [:registry]
   )
 
-  def build(path, name) do
-    credentials = Devnode.Client.Node.new(name)
+  EEx.function_from_file(
+    :def,
+    :fig_template,
+    "lib/templates/fig.eex",
+    [:image, :registry, :shared_dirs]
+  )
+
+  def build(path, name, image) do
+    credentials = Devnode.Client.Node.new(name, image)
     create_dirs(path)
 
     env_path(path) |> copy_static_files
     env_path(path) |> create_vagrantfile(credentials)
+    scripts_path(path) |> create_fig_config(credentials)
     recipes_path(path) |> create_docker_setup
 
     credentials
@@ -39,6 +47,10 @@ defmodule Devnode.Client.Scaffold do
     project_path <> "/env"
   end
 
+  defp scripts_path(project_path) do
+    project_path <> "/scripts"
+  end
+
   defp recipes_path(path) do
     path <> "/env/recipes"
   end
@@ -50,6 +62,14 @@ defmodule Devnode.Client.Scaffold do
 
     file = path <> "/Vagrantfile"
     File.write(file, template)
+  end
+
+  defp create_fig_config(path, credentials) do
+    template = credentials
+    |> Map.get(:image)
+    |> fig_template(@registry, ["app", "scripts"])
+
+    File.write(Path.expand("fig.yml", path), template)
   end
 
   defp create_docker_setup(path) do

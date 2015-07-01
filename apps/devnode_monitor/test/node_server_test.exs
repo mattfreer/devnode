@@ -23,20 +23,20 @@ defmodule Devnode.Monitor.NodeSereverTest do
 
   test "new nodes are named and added to GenServer state" do
     pid = :global.whereis_name(NodeServer)
-    node1 = NodeServer.add_entry(pid, "foo")
+    node1 = NodeServer.add_entry(pid, "foo", "bar")
     assert %{ip: _, name: _} = node1
 
     nodes = NodeServer.entries(pid)
     assert %HashDict{} = nodes
     assert ["foo"] = HashDict.keys(nodes)
-    assert [%{ip: _, name: "foo"}] = HashDict.values(nodes)
+    assert [%{ip: _, name: "foo", image: "bar"}] = HashDict.values(nodes)
   end
 
   test "node names must be unique" do
     pid = :global.whereis_name(NodeServer)
-    node1 = NodeServer.add_entry(pid, "foo")
+    node1 = NodeServer.add_entry(pid, "foo", "bar")
     assert %{ip: _, name: _} = node1
-    node2 = NodeServer.add_entry(pid, "foo")
+    node2 = NodeServer.add_entry(pid, "foo", "bar")
     assert {:error, "node names must be unique, foo is already in use"} == node2
   end
 end

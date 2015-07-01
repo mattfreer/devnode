@@ -18,8 +18,8 @@ defmodule Devnode.CLI.Test do
     }
 
     nodes = Enum.into [
-      foo: %{ip: "192.169.100.100", name: "foo"},
-      bar: %{ip: "192.169.100.101", name: "bar"}
+      foo: %{image: "a_env", ip: "192.169.100.100", name: "foo"},
+      bar: %{image: "c_env", ip: "192.169.100.101", name: "bar"}
     ], HashDict.new
 
     {
@@ -35,7 +35,7 @@ defmodule Devnode.CLI.Test do
       cwd: fn -> Map.get(options.project, :path) end] do
 
       with_mock Devnode.Client.Node, [:passthrough], [
-        new: fn(name) -> %{name: name, ip: "192.100.100.100"} end] do
+        new: fn(name, image) -> %{image: image, name: name, ip: "192.100.100.100"} end] do
 
         with_mock ImageRepo, [:passthrough], [ dir: fn -> options.image_repo end] do
           with_mock IO, [:passthrough], [ gets: fn(msg) -> options.image end] do
@@ -65,7 +65,7 @@ defmodule Devnode.CLI.Test do
   test "list returns an table of nodes, when nodes are registered", %{nodes: nodes} do
     with_mock Devnode.Client.Node, [:passthrough], [list: fn -> nodes end] do
       argv = ["list"]
-      expected = "192.169.100.100    foo    \n192.169.100.101    bar    "
+      expected = "a_env    192.169.100.100    foo    \nc_env    192.169.100.101    bar    "
       assert Devnode.Client.CLI.main(argv) == expected
     end
   end
@@ -80,7 +80,7 @@ defmodule Devnode.CLI.Test do
   test "build returns new node credentials, when valid image is selected", %{test_project: project, image_repo: image_repo} do
     with_build_mocks(%{project: project, image_repo: image_repo, image: "a_env"}, fn ->
       argv = ["build", "-n=my_node_name"]
-      expected = "192.100.100.100    my_node_name"
+      expected = "a_env    192.100.100.100    my_node_name"
       assert Devnode.Client.CLI.main(argv) == expected
     end)
   end
@@ -106,6 +106,9 @@ defmodule Devnode.CLI.Test do
 
       file_content(project, "/env/recipes/docker_setup.sh")
       |> assert_file_content("docker_setup.txt")
+
+      file_content(project, "/scripts/fig.yml")
+      |> assert_file_content("fig.txt")
     end)
   end
 
