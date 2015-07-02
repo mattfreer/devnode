@@ -1,4 +1,3 @@
-DevnodeClient
-=============
+#DevnodeClient
 
-** TODO: Add description **
+The Command Line interface for Devnode
