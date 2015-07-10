@@ -1,4 +1,4 @@
-defmodule Devnode.Client.Support.TestDir do
+defmodule Devnode.Support.TestDir do
   def remove do
     File.rm_rf!(tmp_dir)
   end

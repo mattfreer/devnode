@@ -1,7 +1,7 @@
 defmodule Devnode.CLI.Test do
   use ExUnit.Case
-  alias Devnode.Client.Support.TestDir, as: TestDir
-  alias Devnode.Client.Support.FakeImageRepo
+  alias Devnode.Support.TestDir
+  alias Devnode.Support.FakeImageRepo
   alias Devnode.Client.ImageRepo
   import Devnode.Client.Support.Assertions
   import Mock

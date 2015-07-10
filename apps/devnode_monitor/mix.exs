@@ -33,6 +33,7 @@ defmodule Devnode.Monitor.Mixfile do
   # Type `mix help deps` for more examples and options
   defp deps do
     [
+      {:devnode_support, in_umbrella: true, only: [:test]},
       {:mock, "~> 0.1.0"}
     ]
   end

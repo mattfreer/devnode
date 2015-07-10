@@ -1,8 +1,8 @@
 defmodule ImageRepoTest do
   use ExUnit.Case
   alias Devnode.Client.ImageRepo
-  alias Devnode.Client.Support.TestDir
-  alias Devnode.Client.Support.FakeImageRepo
+  alias Devnode.Support.TestDir
+  alias Devnode.Support.FakeImageRepo
 
   # called before each test is run
   setup do

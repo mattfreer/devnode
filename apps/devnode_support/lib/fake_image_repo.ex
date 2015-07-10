@@ -1,5 +1,5 @@
-defmodule Devnode.Client.Support.FakeImageRepo do
-  alias Devnode.Client.Support.TestDir, as: TestDir
+defmodule Devnode.Support.FakeImageRepo do
+  alias Devnode.Support.TestDir
 
   @defaults [
     images: ["a_env", "c_env"],
