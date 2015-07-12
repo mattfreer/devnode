@@ -4,3 +4,5 @@ erl_crash.dump
 *.ez
 /apps/devnode_client/devnode_client
 /apps/devnode_client/env
+/apps/devnode_client/app
+/apps/devnode_client/scripts
