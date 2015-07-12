@@ -10,6 +10,7 @@ defmodule Devnode.CLI.Test do
   setup do
     on_exit fn ->
       Devnode.Client.stop
+      FakeImageRepo.remove
       TestDir.remove
     end
 
@@ -22,11 +23,12 @@ defmodule Devnode.CLI.Test do
       bar: %{image: "c_env", ip: "192.169.100.101", name: "bar"}
     ], HashDict.new
 
+    FakeImageRepo.build
+
     {
       :ok,
       nodes: nodes,
-      test_project: test_project,
-      image_repo: FakeImageRepo.build
+      test_project: test_project
     }
   end
 
@@ -37,10 +39,8 @@ defmodule Devnode.CLI.Test do
       with_mock Devnode.Client.Node, [:passthrough], [
         new: fn(name, image) -> %{image: image, name: name, ip: "192.100.100.100"} end] do
 
-        with_mock ImageRepo, [:passthrough], [ dir: fn -> options.image_repo end] do
-          with_mock IO, [:passthrough], [ gets: fn(msg) -> options.image end] do
-            fun.()
-          end
+        with_mock IO, [:passthrough], [ gets: fn(msg) -> options.image end] do
+          fun.()
         end
       end
     end
@@ -70,30 +70,30 @@ defmodule Devnode.CLI.Test do
     end
   end
 
-  test "build returns help content if no name is specfied", %{test_project: project, image_repo: image_repo} do
-    with_build_mocks(%{project: project, image_repo: image_repo, image: "a_env"}, fn ->
+  test "build returns help content if no name is specfied", %{test_project: project} do
+    with_build_mocks(%{project: project, image: "a_env"}, fn ->
       argv = ["build"]
       assert Devnode.Client.CLI.main(argv) == "The `build` command should be used as follows:\nbuild --name=node_name\n"
     end)
   end
 
-  test "build returns new node credentials, when valid image is selected", %{test_project: project, image_repo: image_repo} do
-    with_build_mocks(%{project: project, image_repo: image_repo, image: "a_env"}, fn ->
+  test "build returns new node credentials, when valid image is selected", %{test_project: project} do
+    with_build_mocks(%{project: project, image: "a_env"}, fn ->
       argv = ["build", "-n=my_node_name"]
       expected = "a_env    192.100.100.100    my_node_name"
       assert Devnode.Client.CLI.main(argv) == expected
     end)
   end
 
-  test "build returns nil, when invalid image is selected", %{test_project: project, image_repo: image_repo} do
-    with_build_mocks(%{project: project, image_repo: image_repo, image: "invalid"}, fn ->
+  test "build returns nil, when invalid image is selected", %{test_project: project} do
+    with_build_mocks(%{project: project, image: "invalid"}, fn ->
       argv = ["build", "-n=my_node_name"]
       assert Devnode.Client.CLI.main(argv) == nil
     end)
   end
 
-  test "build scaffolds project, when valid image is selected", %{test_project: project, image_repo: image_repo} do
-    with_build_mocks(%{project: project, image_repo: image_repo, image: "c_env"}, fn ->
+  test "build scaffolds project, when valid image is selected", %{test_project: project} do
+    with_build_mocks(%{project: project, image: "c_env"}, fn ->
       argv = ["build", "-n=my_node_name"]
       Devnode.Client.CLI.main(argv)
 
@@ -112,8 +112,8 @@ defmodule Devnode.CLI.Test do
     end)
   end
 
-  test "build doesn't scaffold the project, when invalid image is selected", %{test_project: project, image_repo: image_repo} do
-    with_build_mocks(%{project: project, image_repo: image_repo, image: "invalid"}, fn ->
+  test "build doesn't scaffold the project, when invalid image is selected", %{test_project: project} do
+    with_build_mocks(%{project: project, image: "invalid"}, fn ->
       argv = ["build", "-n=my_node_name"]
       Devnode.Client.CLI.main(argv)
 

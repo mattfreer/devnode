@@ -1,7 +1,7 @@
 defmodule Devnode.Client.ImageRepo do
 
   def dir do
-    System.tmp_dir() <> "/devnode/image_repo/"
+    Application.get_env(:paths, :image_repo)
   end
 
   def list(dir) do

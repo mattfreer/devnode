@@ -1,5 +1,4 @@
 defmodule Devnode.Support.FakeImageRepo do
-  alias Devnode.Support.TestDir
 
   @defaults [
     images: ["a_env", "c_env"],
@@ -14,17 +13,23 @@ defmodule Devnode.Support.FakeImageRepo do
   end
 
   def build(images, non_images \\ []) do
-    registry_path = TestDir.mk_sub_dir("registry")
-
     Enum.each(images, fn(i) ->
-      add_dir(registry_path, i) |> add_file("Dockerfile")
+      add_dir(image_repo_path, i) |> add_file("Dockerfile")
     end)
 
     Enum.each(non_images, fn(i) ->
-      add_dir(registry_path, i)
+      add_dir(image_repo_path, i)
     end)
 
-    registry_path
+    image_repo_path
+  end
+
+  def remove do
+    File.rm_rf!(image_repo_path)
+  end
+
+  defp image_repo_path do
+    Application.get_env(:paths, :image_repo)
   end
 
   defp add_dir(registry, file_path) do

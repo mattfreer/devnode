@@ -1,13 +1,12 @@
 defmodule ImageRepoTest do
   use ExUnit.Case
   alias Devnode.Client.ImageRepo
-  alias Devnode.Support.TestDir
   alias Devnode.Support.FakeImageRepo
 
   # called before each test is run
   setup do
     on_exit fn ->
-      TestDir.remove
+      FakeImageRepo.remove
     end
 
     {:ok, image_repo: FakeImageRepo.build }
