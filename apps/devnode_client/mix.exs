@@ -21,7 +21,7 @@ defmodule Devnode.Client.Mixfile do
   #
   # Type `mix help compile.app` for more information
   def application do
-    [applications: [:logger]]
+    [applications: [:logger, :mix, :yamerl]]
   end
 
   # Dependencies can be Hex packages:
@@ -40,7 +40,8 @@ defmodule Devnode.Client.Mixfile do
   defp deps do
     [
       {:devnode_support, in_umbrella: true, only: [:test]},
-      {:mock, "~> 0.1.0"}
+      {:mock, "~> 0.1.0"},
+      {:yamerl, github: "yakaz/yamerl"}
     ]
   end
 end

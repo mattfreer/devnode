@@ -1,7 +1,8 @@
 defmodule Devnode.Client.ImageRepo do
+  alias Devnode.Client.RuntimeConfig
 
   def dir do
-    Application.get_env(:paths, :image_repo)
+    RuntimeConfig.image_repo_path
   end
 
   def list(dir) do

@@ -1,0 +1,2 @@
+image_repo:
+  path: <%= Path.expand("devnode_test/image_repo", System.tmp_dir) %>

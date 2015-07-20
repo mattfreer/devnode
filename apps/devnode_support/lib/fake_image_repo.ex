@@ -1,4 +1,5 @@
 defmodule Devnode.Support.FakeImageRepo do
+  alias Devnode.Client.RuntimeConfig
 
   @defaults [
     images: ["a_env", "c_env"],
@@ -29,7 +30,7 @@ defmodule Devnode.Support.FakeImageRepo do
   end
 
   defp image_repo_path do
-    Application.get_env(:paths, :image_repo)
+    RuntimeConfig.image_repo_path
   end
 
   defp add_dir(registry, file_path) do

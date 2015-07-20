@@ -12,7 +12,6 @@ defmodule ImageRepoTest do
     {:ok, image_repo: FakeImageRepo.build }
   end
 
-
   test "list returns images in repo", %{image_repo: image_repo} do
     assert ImageRepo.list(image_repo) == ["a_env", "c_env"]
   end
