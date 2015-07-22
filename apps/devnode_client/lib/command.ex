@@ -2,6 +2,8 @@ defmodule Devnode.Client.Command do
   alias Devnode.Client.FileHelper, as: FileHelper
   alias Devnode.Client.ImageRepo
   alias Devnode.Client.Scaffold
+  alias Devnode.Client.RuntimeConfig
+  alias Devnode.Client.RuntimeConfigError
 
   @build_question "Please specify the image that you wish to use:"
 
@@ -32,11 +34,18 @@ defmodule Devnode.Client.Command do
   end
 
   defp build_node(values) do
+    requires_runtime_config
     images = ImageRepo.list(ImageRepo.dir)
     selection = image_selection(images)
 
     if(Enum.member?(images, selection)) do
       scaffold_node(Keyword.get(values, :name), selection)
+    end
+  end
+
+  defp requires_runtime_config do
+    unless RuntimeConfig.exists? do
+      raise RuntimeConfigError
     end
   end
 

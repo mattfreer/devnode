@@ -6,6 +6,10 @@ defmodule Devnode.Client.RuntimeConfig do
     end
   end
 
+  def exists?(p \\ path) do
+    File.exists?(p)
+  end
+
   def load(path) do
     parse(path, Mix.env)
   end

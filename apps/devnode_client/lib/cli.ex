@@ -1,4 +1,7 @@
 defmodule Devnode.Client.CLI do
+  alias Devnode.Client.Help
+  alias Devnode.Client.RuntimeConfigError
+
   def main(argv) do
     case Devnode.Client.start do
       {:ok, _} -> process(argv)
@@ -27,9 +30,17 @@ defmodule Devnode.Client.CLI do
     end)
 
     receive do
-      {:EXIT, pid, _ } -> Devnode.Client.Help.msg(elem(options,1))
+      {:EXIT, _pid, reason } -> receive_exit(reason, elem(options, 1))
       {ref, {:result, data}} -> data
     end
+  end
+
+  defp receive_exit({ %RuntimeConfigError{}, _}, cmds) do
+    Help.msg(cmds, "runtime_config")
+  end
+
+  defp receive_exit(_reason, cmds) do
+    Help.msg(cmds)
   end
 
   defp respond(device \\ :erlang.group_leader(), response) do

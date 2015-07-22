@@ -77,6 +77,14 @@ defmodule Devnode.CLI.Test do
     end)
   end
 
+  test "build requires runtime config" do
+    with_mock Devnode.Client.RuntimeConfig, [:passthrough], [ exists?: fn -> false end] do
+      argv = ["build"]
+      assert Devnode.Client.CLI.main(argv) ==
+      "The `build` command requires a `.devnoderc` config file to be present in the current working directory\n"
+    end
+  end
+
   test "build returns new node credentials, when valid image is selected", %{test_project: project} do
     with_build_mocks(%{project: project, image: "a_env"}, fn ->
       argv = ["build", "-n=my_node_name"]

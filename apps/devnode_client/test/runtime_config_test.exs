@@ -17,5 +17,11 @@ defmodule Devnode.Client.RuntimeConfigTest do
   test "image_repo_path" do
     assert RuntimeConfig.image_repo_path == "/tmp/devnode_test/image_repo"
   end
+
+  test :exists? do
+    assert RuntimeConfig.exists? == true
+    assert RuntimeConfig.exists?(RuntimeConfig.path) == true
+    assert RuntimeConfig.exists?("/bad/file/path") == false
+  end
 end
 
