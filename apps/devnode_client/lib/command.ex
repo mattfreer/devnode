@@ -4,6 +4,7 @@ defmodule Devnode.Client.Command do
   alias Devnode.Client.Scaffold
   alias Devnode.Client.RuntimeConfig
   alias Devnode.Client.RuntimeConfigError
+  alias Devnode.Client.Node
 
   @build_question "Please specify the image that you wish to use:"
 
@@ -50,7 +51,7 @@ defmodule Devnode.Client.Command do
   end
 
   defp scaffold_node(name, image) when byte_size(name) > 0 do
-    credentials = Scaffold.build(FileHelper.cwd, name, image)
+    credentials = Scaffold.build(FileHelper.cwd, Node.new(name, image))
     "#{ Map.get(credentials, :image) }    #{ Map.get(credentials, :ip) }    #{ Map.get(credentials, :name) }"
   end
 

@@ -29,8 +29,7 @@ defmodule Devnode.Client.Scaffold do
     [:image, :registry, :shared_dirs]
   )
 
-  def build(path, name, image) do
-    credentials = Devnode.Client.Node.new(name, image)
+  def build(path, credentials) do
     create_dirs(path)
 
     tasks(path, credentials)
