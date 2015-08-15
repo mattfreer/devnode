@@ -1,7 +1,9 @@
-defmodule Devnode.Client.Scaffold do
+defmodule Devnode.Client.NodeScaffold do
   @moduledoc """
-  This module scaffolds the project structure
+  This module scaffolds a node. It uses the Scaffold.Mixin
   """
+
+  use Devnode.Client.ScaffoldMixin
   require EEx
 
   @vm_memory 1024
@@ -29,45 +31,21 @@ defmodule Devnode.Client.Scaffold do
     [:image, :registry, :shared_dirs]
   )
 
-  def build(path, credentials) do
-    create_dirs(path)
-
-    tasks(path, credentials)
-    |> Enum.map(&apply_async/1)
-    |> Enum.map(&Task.await/1)
-
-    credentials
-  end
-
-  defp apply_async({f, args}) do
-    Task.async(fn -> apply(__MODULE__, f, args) end)
-  end
-
   defp tasks(path, credentials) do
+    env_path = Path.expand("env", path)
+    scripts_path = Path.expand("scripts", path)
+    recipes_path = Path.expand("env/recipes", path)
+
     [
-      {:copy_static_files, [env_path(path)]},
-      {:create_vagrantfile, [env_path(path), credentials]},
-      {:create_fig_config, [scripts_path(path), credentials]},
-      {:create_docker_setup, [recipes_path(path)]}
+      {__MODULE__, :copy_static_files, [env_path]},
+      {__MODULE__, :create_vagrantfile, [env_path, credentials]},
+      {__MODULE__, :create_fig_config, [scripts_path, credentials]},
+      {__MODULE__, :create_docker_setup, [recipes_path]}
     ]
   end
 
-  defp create_dirs(path) do
-    Enum.each(["app", "scripts", "env/recipes"], fn(d) ->
-      File.mkdir_p("#{path}/#{d}")
-    end)
-  end
-
-  defp env_path(project_path) do
-    Path.expand("env", project_path)
-  end
-
-  defp scripts_path(project_path) do
-    Path.expand("scripts", project_path)
-  end
-
-  defp recipes_path(project_path) do
-    Path.expand("env/recipes", project_path)
+  defp sub_dirs do
+    ["app", "scripts", "env/recipes"]
   end
 
   @doc false
@@ -82,8 +60,7 @@ defmodule Devnode.Client.Scaffold do
 
   @doc false
   def create_fig_config(path, credentials) do
-    template = credentials
-    |> Map.get(:image)
+    template = Map.get(credentials, :image)
     |> fig_template(@registry, ["app", "scripts"])
 
     Path.expand("fig.yml", path)

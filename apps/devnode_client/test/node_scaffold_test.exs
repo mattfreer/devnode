@@ -1,7 +1,7 @@
 defmodule Devnode.Client.ScaffoldTest do
   use ExUnit.Case
   alias Devnode.Support.TestDir, as: TestDir
-  alias Devnode.Client.Scaffold, as: Scaffold
+  alias Devnode.Client.NodeScaffold, as: Scaffold
   import Devnode.Client.Support.Assertions
 
   setup do

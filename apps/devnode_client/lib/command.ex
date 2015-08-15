@@ -1,7 +1,7 @@
 defmodule Devnode.Client.Command do
   alias Devnode.Client.FileHelper, as: FileHelper
   alias Devnode.Client.ImageRepo
-  alias Devnode.Client.Scaffold
+  alias Devnode.Client.NodeScaffold
   alias Devnode.Client.RuntimeConfig
   alias Devnode.Client.RuntimeConfigError
   alias Devnode.Client.Node
@@ -51,7 +51,7 @@ defmodule Devnode.Client.Command do
   end
 
   defp scaffold_node(name, image) when byte_size(name) > 0 do
-    credentials = Scaffold.build(FileHelper.cwd, Node.new(name, image))
+    credentials = NodeScaffold.build(FileHelper.cwd, Node.new(name, image))
     "#{ Map.get(credentials, :image) }    #{ Map.get(credentials, :ip) }    #{ Map.get(credentials, :name) }"
   end
 
