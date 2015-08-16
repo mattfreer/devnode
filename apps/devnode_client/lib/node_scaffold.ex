@@ -1,9 +1,11 @@
 defmodule Devnode.Client.NodeScaffold do
   @moduledoc """
-  This module scaffolds a node. It uses the Scaffold.Mixin
+  This module scaffolds a node. It uses the `Scaffold.Mixin` and
+  implements the required functions of the `Scaffolder` behaviour.
   """
 
   use Devnode.Client.ScaffoldMixin
+
   require EEx
 
   @vm_memory 1024
@@ -31,7 +33,7 @@ defmodule Devnode.Client.NodeScaffold do
     [:image, :registry, :shared_dirs]
   )
 
-  defp tasks(path, credentials) do
+  def tasks(path, credentials) do
     env_path = Path.expand("env", path)
     scripts_path = Path.expand("scripts", path)
     recipes_path = Path.expand("env/recipes", path)
@@ -44,7 +46,7 @@ defmodule Devnode.Client.NodeScaffold do
     ]
   end
 
-  defp sub_dirs do
+  def sub_dirs do
     ["app", "scripts", "env/recipes"]
   end
 

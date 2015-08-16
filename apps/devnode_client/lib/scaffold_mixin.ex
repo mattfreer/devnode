@@ -3,17 +3,20 @@ defmodule Devnode.Client.ScaffoldMixin do
   This module is a mixin to be used for modules that need to scaffold
   directory structures.
 
-  Modules that use this mixin, should override the following functions:
+  The `ScaffoldMixin` module adopts the `Scaffolder` behaviour. But
+  it doesn't implement the requiered `tasks/2` function its self. Rather
+  this is a requirement for modules that use the `ScaffoldMixin`.
 
-  * tasks/2: return a list of MFA tuples representing scaffold
-  operations that can be run in parallel.
+  Modules that use this mixin, can override the following functions:
 
   * sub_dirs/0: return a list names for directories that should be
-  created.
+  created when `build` is called.
   """
 
   defmacro __using__(_opts) do
     quote do
+      @behaviour Devnode.Client.Scaffolder
+
       def build(path, credentials) do
         create_dirs(path)
 
@@ -32,17 +35,13 @@ defmodule Devnode.Client.ScaffoldMixin do
         []
       end
 
-      defp tasks(path, credentials) do
-        []
-      end
-
       defp create_dirs(path) do
         Enum.each(sub_dirs, fn(d) ->
           File.mkdir_p("#{path}/#{d}")
         end)
       end
 
-      defoverridable [tasks: 2, sub_dirs: 0]
+      defoverridable [sub_dirs: 0]
     end
   end
 end
