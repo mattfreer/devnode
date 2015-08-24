@@ -9,7 +9,16 @@ use Mix.Config
 # party users, it should be done in your mix.exs file.
 
 config :paths, [
-  image_repo: Path.expand("devnode/image_repo", System.tmp_dir)
+  image_repo: Path.expand("devnode/image_repo", System.tmp_dir),
+  registry: Path.expand("devnode/registry", System.tmp_dir)
+]
+
+config :ips, [
+  registry: "192.168.10.10"
+]
+
+config :ports, [
+  registry: "5000"
 ]
 
 if Path.expand("#{Mix.env}.exs", __DIR__) |> File.exists? do

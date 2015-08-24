@@ -9,7 +9,7 @@ defmodule Devnode.Client.NodeScaffold do
   require EEx
 
   @vm_memory 1024
-  @registry "192.168.10.10:5000"
+  @registry "#{Application.get_env(:ips, :registry)}:#{Application.get_env(:ports, :registry)}"
   @templates "lib/templates"
 
   EEx.function_from_file(

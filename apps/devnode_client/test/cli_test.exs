@@ -46,8 +46,8 @@ defmodule Devnode.CLI.Test do
     end
   end
 
-  defp file_content(project, file_path) do
-    File.read(project.path <> file_path) |> elem(1)
+  defp file_content(path) do
+    File.read(path) |> elem(1)
   end
 
   test "with non matched arguments it returns no match" do
@@ -109,13 +109,13 @@ defmodule Devnode.CLI.Test do
       assert File.dir?(project.path <> "/env") == true
       assert File.exists?(project.path <> "/env/bootstrap.sh") == true
 
-      file_content(project, "/env/Vagrantfile")
+      file_content(Path.expand("env/Vagrantfile", project.path))
       |> assert_file_content("vagrant_file.txt")
 
-      file_content(project, "/env/recipes/docker_setup.sh")
+      file_content(Path.expand("env/recipes/docker_setup.sh", project.path))
       |> assert_file_content("docker_setup.txt")
 
-      file_content(project, "/scripts/fig.yml")
+      file_content(Path.expand("scripts/fig.yml", project.path))
       |> assert_file_content("fig.txt")
     end)
   end
@@ -128,6 +128,29 @@ defmodule Devnode.CLI.Test do
       assert File.dir?(project.path <> "/app") == false
       assert File.dir?(project.path <> "/env") == false
     end)
+  end
+
+  test "build-registry returns new node credentials" do
+    argv = ["build-registry"]
+    expected = "192.168.10.10    registry"
+    assert Devnode.Client.CLI.main(argv) == expected
+  end
+
+  test "build-registry scaffolds registry" do
+    argv = ["build-registry"]
+    Devnode.Client.CLI.main(argv)
+
+    registry_path = Application.get_env(:paths, :registry)
+
+    assert File.dir?(Path.expand("app", registry_path)) == true
+    assert File.dir?(Path.expand("env", registry_path)) == true
+    assert File.dir?(Path.expand("scripts", registry_path)) == true
+
+    assert File.ls(Path.expand("app", registry_path)) |> elem(1) == ["b_env", "a_env", ".dot_file", "c_env"]
+    assert File.exists?(Path.expand("env/bootstrap.sh", registry_path)) == true
+
+    file_content(Path.expand("env/Vagrantfile", registry_path))
+    |> assert_file_content("registry_vagrant_file.txt")
   end
 end
 

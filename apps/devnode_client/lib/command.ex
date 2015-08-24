@@ -2,6 +2,7 @@ defmodule Devnode.Client.Command do
   alias Devnode.Client.FileHelper, as: FileHelper
   alias Devnode.Client.ImageRepo
   alias Devnode.Client.NodeScaffold
+  alias Devnode.Client.RegistryScaffold
   alias Devnode.Client.RuntimeConfig
   alias Devnode.Client.RuntimeConfigError
   alias Devnode.Client.Node
@@ -17,6 +18,7 @@ defmodule Devnode.Client.Command do
     cond do
       includes?(list, "list") -> &list_nodes/1
       includes?(list, "build") -> &build_node/1
+      includes?(list, "build-registry") -> &build_registry/1
 
       true ->
         fn(_values) -> "no match" end
@@ -42,6 +44,24 @@ defmodule Devnode.Client.Command do
     if(Enum.member?(images, selection)) do
       scaffold_node(Keyword.get(values, :name), selection)
     end
+  end
+
+  defp build_registry(values) do
+    registry_path = Application.get_env(:paths, :registry)
+
+    RegistryScaffold.build(registry_path, registry_credentials)
+    |> registry_summary
+  end
+
+  defp registry_credentials do
+    %{
+      name: "registry",
+      ip: Application.get_env(:ips, :registry)
+    }
+  end
+
+  defp registry_summary(credentials) do
+    "#{ Map.get(credentials, :ip) }    #{ Map.get(credentials, :name) }"
   end
 
   defp requires_runtime_config do
