@@ -29,6 +29,13 @@ elixir --detached --name dnmonitor@127.0.0.1 -S mix run --no-halt
 
 ```
 
+##Scaffolding the Docker registry
+Behind the scenes Devnode runs a private Docker registry, in a separate VM. The purpose of this registry is to store and make available Docker images to the user's development environments (nodes). The registry is scaffolded using the `build-registry` command. Typically this command will only be run when the user first installs Devnode. However the registry can be re-built by passing the `--force` option to the `build-registry` command.
+```bash
+devnode_client build-registry -f
+
+```
+
 ##Scaffolding a Devlopment environment
 A new development environment is scaffolded using the `build` command. This command requires the user to assign a `name` to their node. The `build` command is interactive, prompting the user to specify the type of environment they would like to scaffold. The choice of available environments is based on the images that are available in the private Docker registry. Once the environment is selected the node is auto assigned an IP address and the project is scaffold.
 ```bash
