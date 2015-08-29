@@ -152,5 +152,19 @@ defmodule Devnode.CLI.Test do
     file_content(Path.expand("env/Vagrantfile", registry_path))
     |> assert_file_content("registry_vagrant_file.txt")
   end
+
+  test "when registry exists, build-registry returns help content", %{test_project: project} do
+    File.mkdir_p(Application.get_env(:paths, :registry))
+    argv = ["build-registry"]
+    assert Devnode.Client.CLI.main(argv) == "The `build-registry` command will only replace an existing registry if the `--force` option is specified\n"
+  end
+
+  test "when registry exists, build-registry replaces registry, if `force` option is specified", %{test_project: project} do
+    File.mkdir_p(Application.get_env(:paths, :registry))
+    argv = ["build-registry", "-f"]
+
+    expected = "192.168.10.10    registry"
+    assert Devnode.Client.CLI.main(argv) == expected
+  end
 end
 

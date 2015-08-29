@@ -1,6 +1,7 @@
 defmodule Devnode.Client.RegistryScaffold do
   use Devnode.Client.ScaffoldMixin
   alias Devnode.Client.ImageRepo
+  alias Devnode.Client.RegistryExistsError
 
   require EEx
 
@@ -13,6 +14,27 @@ defmodule Devnode.Client.RegistryScaffold do
     Path.expand("registry_vagrant_file.eex", @templates),
     [:ip, :memory, :shared_dirs]
   )
+
+  def valid?(path, credentials) do
+    valid = {:ok, "success"}
+
+    if File.exists?(path) do
+      valid = case Map.get(credentials, :override) do
+        true ->
+          _ = File.rm(path)
+          {:ok, "success"}
+
+        _ ->
+          {:error, &registry_exists/0}
+      end
+    end
+    valid
+  end
+
+  @spec registry_exists() :: no_return
+  def registry_exists do
+    raise RegistryExistsError
+  end
 
   def tasks(path, credentials) do
     env_path = Path.expand("env", path)

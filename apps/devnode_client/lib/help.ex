@@ -8,6 +8,12 @@ defmodule Devnode.Client.Help do
     requires_runtime_config(cmd)
   end
 
+  def msg([cmd], "registry_exists") do
+    """
+    The `#{cmd}` command will only replace an existing registry if the `--force` option is specified
+    """
+  end
+
   defp requires_runtime_config(cmd) do
     """
     The `#{cmd}` command requires a `.devnoderc` config file to be present in the current working directory

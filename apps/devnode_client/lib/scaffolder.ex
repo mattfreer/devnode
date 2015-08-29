@@ -15,5 +15,7 @@ defmodule Devnode.Client.Scaffolder do
   {module, function, [arguments]}
   """
   defcallback tasks(String.t, %{}) :: [{atom, atom, [any]}]
+
+  defcallback valid?(String.t, %{}) :: {atom, fun|String.t}
 end
 

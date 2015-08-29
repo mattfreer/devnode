@@ -1,6 +1,7 @@
 defmodule Devnode.Client.CLI do
   alias Devnode.Client.Help
   alias Devnode.Client.RuntimeConfigError
+  alias Devnode.Client.RegistryExistsError
 
   def main(argv) do
     case Devnode.Client.start do
@@ -17,8 +18,8 @@ defmodule Devnode.Client.CLI do
   end
 
   defp get_options(argv) do
-    switches = [name: :string]
-    aliases = [n: :name]
+    switches = [name: :string, force: :boolean]
+    aliases = [n: :name, f: :force]
     OptionParser.parse(argv, switches: switches, aliases: aliases)
   end
 
@@ -37,6 +38,10 @@ defmodule Devnode.Client.CLI do
 
   defp receive_exit({ %RuntimeConfigError{}, _}, cmds) do
     Help.msg(cmds, "runtime_config")
+  end
+
+  defp receive_exit({ %RegistryExistsError{}, _}, cmds) do
+    Help.msg(cmds, "registry_exists")
   end
 
   defp receive_exit(_reason, cmds) do

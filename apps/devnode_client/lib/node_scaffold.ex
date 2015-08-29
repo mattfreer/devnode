@@ -46,6 +46,18 @@ defmodule Devnode.Client.NodeScaffold do
     ]
   end
 
+  def valid?(_path, %{:ip => _, :image => _}) do
+    {:ok, "success"}
+  end
+  def valid?(_path, %{}) do
+    {:error, &invalid_credentials/0}
+  end
+
+  @spec invalid_credentials() :: no_return
+  def invalid_credentials do
+    raise "invalid credentials"
+  end
+
   def sub_dirs do
     ["app", "scripts", "env/recipes"]
   end

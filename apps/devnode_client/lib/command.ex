@@ -46,20 +46,26 @@ defmodule Devnode.Client.Command do
     end
   end
 
+  @spec build_registry(Keyword.t) :: String.t | no_return
   defp build_registry(values) do
     registry_path = Application.get_env(:paths, :registry)
 
-    RegistryScaffold.build(registry_path, registry_credentials)
-    |> registry_summary
+    case RegistryScaffold.build(registry_path, registry_credentials(values)) do
+      {:ok, credentials} -> registry_summary(credentials)
+      {:error, callback} -> callback.()
+    end
   end
 
-  defp registry_credentials do
+  @spec registry_credentials(Keyword.t) :: map
+  defp registry_credentials(values) do
     %{
       name: "registry",
-      ip: Application.get_env(:ips, :registry)
+      ip: Application.get_env(:ips, :registry),
+      override: Keyword.get(values, :force)
     }
   end
 
+  @spec registry_summary(map) :: String.t
   defp registry_summary(credentials) do
     "#{ Map.get(credentials, :ip) }    #{ Map.get(credentials, :name) }"
   end
@@ -70,8 +76,15 @@ defmodule Devnode.Client.Command do
     end
   end
 
+  @spec scaffold_node(String.t, String.t) :: String.t | no_return
   defp scaffold_node(name, image) when byte_size(name) > 0 do
-    credentials = NodeScaffold.build(FileHelper.cwd, Node.new(name, image))
+    case NodeScaffold.build(FileHelper.cwd, Node.new(name, image)) do
+      {:ok, credentials} -> node_summary(credentials)
+      {:error, error_callback} -> error_callback.()
+    end
+  end
+
+  defp node_summary(credentials) do
     "#{ Map.get(credentials, :image) }    #{ Map.get(credentials, :ip) }    #{ Map.get(credentials, :name) }"
   end
 

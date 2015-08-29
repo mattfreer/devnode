@@ -9,20 +9,31 @@ defmodule Devnode.Client.ScaffoldMixin do
 
   Modules that use this mixin, can override the following functions:
 
-  * sub_dirs/0: return a list names for directories that should be
-  created when `build` is called.
+  * valid?/2: validate that the build should commence. Called from
+  `build/2`.
+
+  * sub_dirs/0: return a list of names for directories that should be
+  created. Called from `build/2`.
   """
 
   defmacro __using__(_opts) do
     quote do
       @behaviour Devnode.Client.Scaffolder
 
+      @spec build(String.t, map) :: tuple
       def build(path, credentials) do
-        create_dirs(path)
+        case valid?(path, credentials) do
+          {:error, callback} = e -> e
+          {:ok, _} -> {:ok, start_build(path, credentials)}
+        end
+      end
+
+      defp start_build(path, credentials) do
+        _ = create_dirs(path)
 
         _ = tasks(path, credentials)
-        |> Enum.map(&apply_async/1)
-        |> Enum.map(&Task.await/1)
+            |> Enum.map(&apply_async/1)
+            |> Enum.map(&Task.await/1)
 
         credentials
       end
