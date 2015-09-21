@@ -5,10 +5,10 @@ defmodule Devnode.Monitor.NodeStash do
   end
 
   def write(data, f \\ file) do
-    unless exists? do
-      File.mkdir_p Path.dirname(f)
+    _ = unless exists? do
+      File.mkdir_p(Path.dirname(f))
     end
-    File.write(f, "#{ :erlang.term_to_binary(data) }")
+    _ = File.write(f, "#{ :erlang.term_to_binary(data) }")
   end
 
   def read(f \\ file) do
