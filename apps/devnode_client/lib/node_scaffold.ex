@@ -16,7 +16,7 @@ defmodule Devnode.Client.NodeScaffold do
     :def,
     :vagrantfile_template,
     Path.expand("vagrant_file.eex", @templates),
-    [:ip, :memory, :shared_dirs]
+    [:ip, :port, :memory, :shared_dirs]
   )
 
   EEx.function_from_file(
@@ -46,7 +46,7 @@ defmodule Devnode.Client.NodeScaffold do
     ]
   end
 
-  def valid?(_path, %{:ip => _, :image => _}) do
+  def valid?(_path, %{:ip => _, :image => _, :port => _}) do
     {:ok, "success"}
   end
   def valid?(_path, %{}) do
@@ -64,9 +64,9 @@ defmodule Devnode.Client.NodeScaffold do
 
   @doc false
   def create_vagrantfile(path, credentials) do
-    template = credentials
-    |> Map.get(:ip)
-    |> vagrantfile_template(@vm_memory, ["app", "scripts"])
+    ip = Map.get(credentials, :ip)
+    port = Map.get(credentials, :port)
+    template = vagrantfile_template(ip, port, @vm_memory, ["app", "scripts"])
 
     Path.expand("Vagrantfile", path)
     |> File.write(template)

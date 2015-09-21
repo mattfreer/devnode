@@ -12,7 +12,8 @@ defmodule Devnode.Client.ScaffoldTest do
     node_credentials = %{
       name: "test project",
       image: "a_env",
-      ip: "192.100.100.100"
+      ip: "192.100.100.100",
+      port: 7001
     }
 
     {
@@ -24,7 +25,7 @@ defmodule Devnode.Client.ScaffoldTest do
 
   test "#build returns node credentials", %{path: path, node_credentials: node_credentials} do
     expected = Scaffold.build(path, node_credentials)
-    assert expected == {:ok, %{image: "a_env", ip: "192.100.100.100", name: "test project"}}
+    assert expected == {:ok, %{image: "a_env", ip: "192.100.100.100", name: "test project", port: 7001}}
   end
 
   test "#build creates a app folder in the project path", %{path: path, node_credentials: node_credentials} do

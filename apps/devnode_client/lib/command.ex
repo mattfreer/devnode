@@ -85,7 +85,7 @@ defmodule Devnode.Client.Command do
   end
 
   defp node_summary(credentials) do
-    "#{ Map.get(credentials, :image) }    #{ Map.get(credentials, :ip) }    #{ Map.get(credentials, :name) }"
+    "#{ Map.get(credentials, :image) }    #{ Map.get(credentials, :ip) }    #{ Map.get(credentials, :port) }    #{ Map.get(credentials, :name) }"
   end
 
   defp image_selection(images) do

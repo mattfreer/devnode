@@ -8,9 +8,9 @@ defmodule Devnode.Monitor.NodeListTest do
     |> NodeList.add_entry(%{name: "bar", image: "b"})
     |> NodeList.add_entry(%{name: "baz", image: "c"})
 
-    assert NodeList.get(list, "foo") == %{image: "a", name: "foo", ip: "192.168.124.1"}
-    assert NodeList.get(list, "bar") == %{image: "b", name: "bar", ip: "192.168.124.2"}
-    assert NodeList.get(list, "baz") == %{image: "c", name: "baz", ip: "192.168.124.3"}
+    assert NodeList.get(list, "foo") == %{image: "a", name: "foo", ip: "192.168.124.1", port: 7001}
+    assert NodeList.get(list, "bar") == %{image: "b", name: "bar", ip: "192.168.124.2", port: 7002}
+    assert NodeList.get(list, "baz") == %{image: "c", name: "baz", ip: "192.168.124.3", port: 7003}
   end
 
   test "node names must be unique" do

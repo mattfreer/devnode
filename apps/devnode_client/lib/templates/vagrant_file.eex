@@ -6,6 +6,7 @@ Vagrant.configure("2") do |config|
   config.ssh.forward_agent = true
   config.vm.provision :shell, :path => "bootstrap.sh"
   config.vm.provision :shell, :path => "recipes/docker_setup.sh"
+  config.vm.network :forwarded_port, guest: 22, host: <%= port %>
 <%= Enum.map shared_dirs, fn(dir) -> %>
   config.vm.synced_folder "./../<%= dir %>", "<%= dir %>", nfs: true
 <%= end %>

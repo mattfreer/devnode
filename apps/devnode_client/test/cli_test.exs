@@ -37,7 +37,7 @@ defmodule Devnode.CLI.Test do
       cwd: fn -> Map.get(options.project, :path) end] do
 
       with_mock Devnode.Client.Node, [:passthrough], [
-        new: fn(name, image) -> %{image: image, name: name, ip: "192.100.100.100"} end] do
+        new: fn(name, image) -> %{image: image, name: name, ip: "192.100.100.100", port: "7001"} end] do
 
         with_mock IO, [:passthrough], [ gets: fn(msg) -> options.image end] do
           fun.()
@@ -88,7 +88,7 @@ defmodule Devnode.CLI.Test do
   test "build returns new node credentials, when valid image is selected", %{test_project: project} do
     with_build_mocks(%{project: project, image: "a_env"}, fn ->
       argv = ["build", "-n=my_node_name"]
-      expected = "a_env    192.100.100.100    my_node_name"
+      expected = "a_env    192.100.100.100    7001    my_node_name"
       assert Devnode.Client.CLI.main(argv) == expected
     end)
   end
