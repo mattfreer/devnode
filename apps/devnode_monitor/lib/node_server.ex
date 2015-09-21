@@ -48,12 +48,12 @@ defmodule Devnode.Monitor.NodeServer do
 
   def handle_cast(:purge, _node_list) do
     list = new_list
-    persist(list)
+    _ = persist(list)
     {:noreply, list}
   end
 
   defp entry_added(new_state, new_entry) do
-    persist(new_state)
+    _ = persist(new_state)
     {:reply, NodeList.get(new_state, new_entry.name) , new_state}
   end
 
