@@ -54,7 +54,7 @@ defmodule Devnode.Monitor.NodeServer do
 
   defp entry_added(new_state, new_entry) do
     _ = persist(new_state)
-    {:reply, NodeList.get(new_state, new_entry.name) , new_state}
+    {:reply, NodeList.get(new_state, Map.get(new_entry, :name)) , new_state}
   end
 
   defp persist(state) do
