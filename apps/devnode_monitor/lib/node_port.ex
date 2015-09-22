@@ -20,13 +20,9 @@ defmodule Devnode.Monitor.NodePort do
 
   @spec highest_port(Devnode.Monitor.NodeList.t) :: pos_integer
   def highest_port(nodes) do
-    if (Enum.count(nodes) > 0) do
-      nodes
-      |> ports
-      |> Enum.max
-    else
-      @start_port
-    end
+    nodes
+    |> ports
+    |> Enum.max
   end
 
   defp free_port?(port) do
@@ -36,8 +32,12 @@ defmodule Devnode.Monitor.NodePort do
     end
   end
 
-  defp ports(list) do
-    Enum.map(list, fn(node) -> elem(node, 1).port end)
+  defp ports(entries) when map_size(entries) == 0 do
+    [@start_port]
+  end
+
+  defp ports(entries) do
+    Enum.map(entries, fn(node) -> elem(node, 1).port end)
   end
 end
 
