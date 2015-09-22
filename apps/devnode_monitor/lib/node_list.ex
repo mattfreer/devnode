@@ -1,5 +1,5 @@
 defmodule Devnode.Monitor.NodeList do
-  defstruct entries: HashDict.new
+  defstruct entries: %{}
 
   import Devnode.Monitor.NodePort, only: [next_free_port: 1, highest_port: 1]
 
@@ -18,11 +18,11 @@ defmodule Devnode.Monitor.NodeList do
   end
 
   def get(%Devnode.Monitor.NodeList{entries: entries} = node_list, key) do
-    HashDict.get(entries, key)
+    Map.get(entries, key)
   end
 
   defp validate_entry(list, entry) do
-    case HashDict.has_key?(Map.get(list, :entries), Map.get(entry, :name)) do
+    case Map.has_key?(Map.get(list, :entries), Map.get(entry, :name)) do
       true -> {:error, "node names must be unique, #{ Map.get(entry, :name) } is already in use"}
       false -> {:ok, entry}
     end
@@ -32,7 +32,7 @@ defmodule Devnode.Monitor.NodeList do
     port = entries |> highest_port |> next_free_port
     entry = Map.put(entry, :ip, next_ip(entries))
     entry = Map.put(entry, :port, port)
-    new_entries = HashDict.put(entries, Map.get(entry, :name), entry)
+    new_entries = Map.put(entries, Map.get(entry, :name), entry)
     %Devnode.Monitor.NodeList{node_list | entries: new_entries }
   end
 

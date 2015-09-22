@@ -36,8 +36,8 @@ defmodule Devnode.Monitor.NodeSereverTest do
 
     pid1 = :global.whereis_name(NodeServer)
     nodes = NodeServer.entries(pid1)
-    assert %HashDict{} = nodes
-    assert ["a", "b"] = HashDict.keys(nodes)
+    assert %{} = nodes
+    assert ["a", "b"] = Map.keys(nodes)
   end
 
   test "new nodes are named and added to GenServer state" do
@@ -46,9 +46,9 @@ defmodule Devnode.Monitor.NodeSereverTest do
     assert %{ip: _, name: _} = node1
 
     nodes = NodeServer.entries(pid)
-    assert %HashDict{} = nodes
-    assert ["foo"] = HashDict.keys(nodes)
-    assert [%{ip: _, name: "foo", image: "bar"}] = HashDict.values(nodes)
+    assert %{} = nodes
+    assert ["foo"] = Map.keys(nodes)
+    assert [%{ip: _, name: "foo", image: "bar"}] = Map.values(nodes)
   end
 
   test "node names must be unique" do
