@@ -61,9 +61,8 @@ defmodule Devnode.Client.RegistryScaffoldTest do
 
   test "#when registry exists, build returns an error", %{path: path, credentials: credentials} do
     File.mkdir_p(path)
-    expected = RegistryScaffold.build(path, credentials)
-    {:error, fun} = expected
-    assert_raise(RegistryExistsError, fun)
+
+    assert RegistryScaffold.build(path, credentials) == {:error, "Registry already exists"}
   end
 
   test "#when registry exists and override is false, build returns an error", %{path: path, credentials: credentials} do

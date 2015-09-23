@@ -1,7 +1,5 @@
 defmodule Devnode.Client.CLI do
   alias Devnode.Client.Help
-  alias Devnode.Client.RuntimeConfigError
-  alias Devnode.Client.RegistryExistsError
 
   def main(argv) do
     case Devnode.Client.start do
@@ -36,16 +34,8 @@ defmodule Devnode.Client.CLI do
     end
   end
 
-  defp receive_exit({ %RuntimeConfigError{}, _}, cmds) do
-    Help.msg(cmds, "runtime_config")
-  end
-
-  defp receive_exit({ %RegistryExistsError{}, _}, cmds) do
-    Help.msg(cmds, "registry_exists")
-  end
-
-  defp receive_exit(_reason, cmds) do
-    Help.msg(cmds)
+  defp receive_exit({ %RuntimeError{} = error, _}, cmds) do
+    Help.msg(cmds, Map.get(error, :message))
   end
 
   defp respond(device \\ :erlang.group_leader(), response) do

@@ -1,7 +1,6 @@
 defmodule Devnode.Client.RegistryScaffold do
   use Devnode.Client.ScaffoldMixin
   alias Devnode.Client.ImageRepo
-  alias Devnode.Client.RegistryExistsError
 
   require EEx
 
@@ -25,15 +24,10 @@ defmodule Devnode.Client.RegistryScaffold do
           {:ok, "success"}
 
         _ ->
-          {:error, &registry_exists/0}
+          {:error, "Registry already exists"}
       end
     end
     valid
-  end
-
-  @spec registry_exists() :: no_return
-  def registry_exists do
-    raise RegistryExistsError
   end
 
   def tasks(path, credentials) do

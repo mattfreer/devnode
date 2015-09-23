@@ -20,10 +20,10 @@ defmodule Devnode.Client.ScaffoldMixin do
     quote do
       @behaviour Devnode.Client.Scaffolder
 
-      @spec build(String.t, map) :: tuple
+      @spec build(String.t, map) :: {:ok, any} | {:error, any}
       def build(path, credentials) do
         case valid?(path, credentials) do
-          {:error, callback} = e -> e
+          {:error, _msg} = e -> e
           {:ok, _} -> {:ok, start_build(path, credentials)}
         end
       end

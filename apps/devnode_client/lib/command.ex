@@ -52,7 +52,7 @@ defmodule Devnode.Client.Command do
 
     case RegistryScaffold.build(registry_path, registry_credentials(values)) do
       {:ok, credentials} -> registry_summary(credentials)
-      {:error, callback} -> callback.()
+      {:error, msg} -> raise msg
     end
   end
 
@@ -72,7 +72,7 @@ defmodule Devnode.Client.Command do
 
   defp requires_runtime_config do
     unless RuntimeConfig.exists? do
-      raise RuntimeConfigError
+      raise "Requires runtime config"
     end
   end
 
@@ -80,7 +80,7 @@ defmodule Devnode.Client.Command do
   defp scaffold_node(name, image) when byte_size(name) > 0 do
     case NodeScaffold.build(FileHelper.cwd, Node.new(name, image)) do
       {:ok, credentials} -> node_summary(credentials)
-      {:error, error_callback} -> error_callback.()
+      {:error, msg} -> IO.inspect :foo; raise msg
     end
   end
 

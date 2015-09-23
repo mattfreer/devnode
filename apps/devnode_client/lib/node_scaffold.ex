@@ -50,12 +50,7 @@ defmodule Devnode.Client.NodeScaffold do
     {:ok, "success"}
   end
   def valid?(_path, %{}) do
-    {:error, &invalid_credentials/0}
-  end
-
-  @spec invalid_credentials() :: no_return
-  def invalid_credentials do
-    raise "invalid credentials"
+    {:error, "invalid credentials"}
   end
 
   def sub_dirs do
