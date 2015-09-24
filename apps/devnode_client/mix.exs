@@ -41,6 +41,7 @@ defmodule Devnode.Client.Mixfile do
     [
       {:devnode_support, in_umbrella: true, only: [:test]},
       {:mock, "~> 0.1.0"},
+      {:towel, "~> 0.2.1"},
       {:yamerl, github: "yakaz/yamerl"}
     ]
   end

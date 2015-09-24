@@ -70,10 +70,11 @@ defmodule Devnode.CLI.Test do
     end
   end
 
-  test "build returns nil if no image name is specfied", %{test_project: project} do
+  test "build returns help content if no image name is specfied", %{test_project: project} do
     with_build_mocks(%{project: project, image: ""}, fn ->
       argv = ["build"]
-      assert Devnode.Client.CLI.main(argv) == nil
+      assert Devnode.Client.CLI.main(argv) ==
+      "No image specified.\nThe `build` command should be used as follows:\nbuild --name=node_name\n\n"
     end)
   end
 
@@ -93,10 +94,11 @@ defmodule Devnode.CLI.Test do
     end)
   end
 
-  test "build returns nil if invalid image is selected", %{test_project: project} do
+  test "build returns help content if invalid image is selected", %{test_project: project} do
     with_build_mocks(%{project: project, image: "invalid"}, fn ->
       argv = ["build", "-n=my_node_name"]
-      assert Devnode.Client.CLI.main(argv) == nil
+      assert Devnode.Client.CLI.main(argv) ==
+      "The image named 'invalid', is not available.\nThe `build` command should be used as follows:\nbuild --name=node_name\n\n"
     end)
   end
 

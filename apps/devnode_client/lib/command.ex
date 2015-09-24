@@ -4,10 +4,12 @@ defmodule Devnode.Client.Command do
   alias Devnode.Client.NodeScaffold
   alias Devnode.Client.RegistryScaffold
   alias Devnode.Client.RuntimeConfig
-  alias Devnode.Client.RuntimeConfigError
   alias Devnode.Client.Node
 
   @build_question "Please specify the image that you wish to use:"
+  use Towel
+
+  @typep result_monad :: {:ok, any} | {:error, any}
 
   def execute(options) do
     f = elem(options, 1) |> match
@@ -37,58 +39,117 @@ defmodule Devnode.Client.Command do
   end
 
   defp build_node(values) do
-    requires_runtime_config
-    images = ImageRepo.list(ImageRepo.dir)
-    selection = image_selection(images)
+    node = images(ImageRepo.dir)
+    |> requires_runtime_config
+    |> get_image_selection
+    |> valid_image_selection?
+    |> scaffold_node(Keyword.get(values, :name))
+    |> node_summary
 
-    if(Enum.member?(images, selection)) do
-      scaffold_node(Keyword.get(values, :name), selection)
-    end
-  end
-
-  @spec build_registry(Keyword.t) :: String.t | no_return
-  defp build_registry(values) do
-    registry_path = Application.get_env(:paths, :registry)
-
-    case RegistryScaffold.build(registry_path, registry_credentials(values)) do
-      {:ok, credentials} -> registry_summary(credentials)
+    case node do
+      {:ok, n} -> n
       {:error, msg} -> raise msg
     end
   end
 
-  @spec registry_credentials(Keyword.t) :: map
-  defp registry_credentials(values) do
-    %{
-      name: "registry",
-      ip: Application.get_env(:ips, :registry),
-      override: Keyword.get(values, :force)
-    }
+  @spec images(Path.t) :: result_monad
+  defp images(dir) do
+    ok(ImageRepo.list(dir))
   end
 
-  @spec registry_summary(map) :: String.t
-  defp registry_summary(credentials) do
-    "#{ Map.get(credentials, :ip) }    #{ Map.get(credentials, :name) }"
+  @spec get_image_selection(result_monad) :: result_monad
+  defp get_image_selection(list) do
+    bind(list, fn(images) ->
+      case ask_build_question(images) do
+        "" -> error("No image specified.");
+        image_name -> ok(%{selection: image_name, list: images})
+      end
+    end)
   end
 
-  defp requires_runtime_config do
-    unless RuntimeConfig.exists? do
-      raise "Requires runtime config"
+  @spec valid_image_selection?(result_monad) :: result_monad
+  defp valid_image_selection?(result) do
+    bind(result, fn(map) ->
+      list = Map.get(map, :list)
+      image = Map.get(map, :selection)
+
+      if Enum.member?(list, image) do
+        ok(image)
+      else
+        error("The image named '#{image}', is not available.")
+      end
+    end)
+  end
+
+  @spec requires_runtime_config(any) :: result_monad
+  defp requires_runtime_config(any) do
+    if RuntimeConfig.exists? do
+      ok(any);
+    else
+      error("Requires runtime config");
     end
   end
 
-  @spec scaffold_node(String.t, String.t) :: String.t | no_return
-  defp scaffold_node(name, image) when byte_size(name) > 0 do
-    case NodeScaffold.build(FileHelper.cwd, Node.new(name, image)) do
-      {:ok, credentials} -> node_summary(credentials)
-      {:error, msg} -> IO.inspect :foo; raise msg
+  defp build_registry(values) do
+    registry = registry_path
+    |> registry_credentials(Keyword.get(values, :force))
+    |> scaffold_registry
+    |> registry_summary
+
+    case registry do
+      {:ok, credentials} -> credentials
+      {:error, msg} -> raise msg
     end
   end
 
-  defp node_summary(credentials) do
-    "#{ Map.get(credentials, :image) }    #{ Map.get(credentials, :ip) }    #{ Map.get(credentials, :port) }    #{ Map.get(credentials, :name) }"
+  @spec registry_path() :: result_monad
+  defp registry_path() do
+    Result.wrap(Application.get_env(:paths, :registry))
   end
 
-  defp image_selection(images) do
+  @spec registry_credentials(result_monad, boolean) :: result_monad
+  defp registry_credentials(result, force) do
+    bind(result, fn(registry_path) ->
+      Result.ok(%{
+        name: "registry",
+        ip: Application.get_env(:ips, :registry),
+        override: force,
+        path: registry_path
+      })
+    end)
+  end
+
+  @spec scaffold_registry(result_monad) :: result_monad
+  defp scaffold_registry(result) do
+    bind(result, fn(credentials) ->
+      path = Map.get(credentials, :path)
+      Result.wrap(RegistryScaffold.build(path, Map.delete(credentials, :path)))
+    end)
+  end
+
+  @spec registry_summary(result_monad) :: result_monad
+  defp registry_summary(result) do
+    bind(result, fn(credentials) ->
+      Result.wrap("#{ Map.get(credentials, :ip) }    #{ Map.get(credentials, :name) }")
+    end)
+  end
+
+  @spec scaffold_node(result_monad, String.t) :: result_monad
+  defp scaffold_node(result, name) do
+    bind(result, fn(image) ->
+      NodeScaffold.build(FileHelper.cwd, Node.new(name, image))
+    end)
+  end
+
+  @spec node_summary(result_monad) :: result_monad
+  defp node_summary(result) do
+    bind(result, fn(n) ->
+      Result.wrap("#{ Map.get(n, :image) }    #{ Map.get(n, :ip) }    #{ Map.get(n, :port) }    #{ Map.get(n, :name) }")
+    end)
+  end
+
+  @spec ask_build_question(list) :: String.t
+  defp ask_build_question(images) do
     IO.gets("#{@build_question}\n#{Enum.join(images, "\n")}\n")
     |> String.rstrip
   end
