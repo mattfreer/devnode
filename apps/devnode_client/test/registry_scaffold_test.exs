@@ -32,7 +32,7 @@ defmodule Devnode.Client.RegistryScaffoldTest do
     dir = Path.expand("app", path)
     RegistryScaffold.build(path, credentials)
     assert File.dir?(dir) == true
-    assert File.ls(dir) |> elem(1) == ["b_env", "a_env", ".dot_file", "c_env"]
+    assert File.ls(dir) |> elem(1) |> Enum.sort == [".dot_file", "a_env", "b_env", "c_env"]
   end
 
   test "#build creates an env folder", %{path: path, credentials: credentials} do

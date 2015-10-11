@@ -148,7 +148,7 @@ defmodule Devnode.CLI.Test do
     assert File.dir?(Path.expand("env", registry_path)) == true
     assert File.dir?(Path.expand("scripts", registry_path)) == true
 
-    assert File.ls(Path.expand("app", registry_path)) |> elem(1) == ["b_env", "a_env", ".dot_file", "c_env"]
+    assert File.ls(Path.expand("app", registry_path)) |> elem(1) |> Enum.sort== [".dot_file", "a_env", "b_env", "c_env"]
     assert File.exists?(Path.expand("env/bootstrap.sh", registry_path)) == true
 
     file_content(Path.expand("env/Vagrantfile", registry_path))
