@@ -39,8 +39,8 @@ defmodule Devnode.Client.Command do
   end
 
   defp build_node(values) do
-    node = images(ImageRepo.dir)
-    |> requires_runtime_config
+    node = requires_runtime_config(&ImageRepo.dir/0)
+    |> images
     |> get_image_selection
     |> valid_image_selection?
     |> scaffold_node(Keyword.get(values, :name))
@@ -52,9 +52,11 @@ defmodule Devnode.Client.Command do
     end
   end
 
-  @spec images(Path.t) :: result_monad
-  defp images(dir) do
-    ok(ImageRepo.list(dir))
+  @spec images(result_monad) :: result_monad
+  defp images(result) do
+    bind(result, fn(path) ->
+      ok(ImageRepo.list(path))
+    end)
   end
 
   @spec get_image_selection(result_monad) :: result_monad
@@ -82,9 +84,9 @@ defmodule Devnode.Client.Command do
   end
 
   @spec requires_runtime_config(any) :: result_monad
-  defp requires_runtime_config(any) do
+  defp requires_runtime_config(any \\ "") do
     if RuntimeConfig.exists? do
-      ok(any);
+      ok(any.());
     else
       error("Requires runtime config");
     end
