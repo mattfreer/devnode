@@ -14,10 +14,10 @@ defmodule Devnode.Client.RegistryScaffoldTest do
 
     credentials = %{
       name: "registry",
-      ip: Application.get_env(:ips, :registry),
+      ip: Application.get_env(:devnode_client, :ips) |> Map.get(:registry),
     }
 
-    path = Application.get_env(:paths, :registry)
+    path = Application.get_env(:devnode_client, :paths) |> Map.get(:registry)
     FakeImageRepo.build
 
     {:ok, path: path, credentials: credentials}

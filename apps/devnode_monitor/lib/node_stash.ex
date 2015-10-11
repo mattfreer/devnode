@@ -26,7 +26,7 @@ defmodule Devnode.Monitor.NodeStash do
   end
 
   def file do
-    Application.get_env(:paths, :stash)
+    Application.get_env(:devnode_monitor, :paths) |> Map.get(:stash)
   end
 
   defp response(value) do

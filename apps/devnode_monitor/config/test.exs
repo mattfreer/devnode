@@ -6,6 +6,6 @@ defmodule ConfigHelper do
   end
 end
 
-config :paths, [
+config :devnode_monitor, :paths, %{
   stash: Path.expand("stash/node_stash", ConfigHelper.tmp_dir)
-]
+}

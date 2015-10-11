@@ -142,7 +142,7 @@ defmodule Devnode.CLI.Test do
     argv = ["build-registry"]
     Devnode.Client.CLI.main(argv)
 
-    registry_path = Application.get_env(:paths, :registry)
+    registry_path = Application.get_env(:devnode_client, :paths) |> Map.get(:registry)
 
     assert File.dir?(Path.expand("app", registry_path)) == true
     assert File.dir?(Path.expand("env", registry_path)) == true
@@ -156,13 +156,13 @@ defmodule Devnode.CLI.Test do
   end
 
   test "when registry exists, build-registry returns help content", %{test_project: project} do
-    File.mkdir_p(Application.get_env(:paths, :registry))
+    File.mkdir_p(Application.get_env(:devnode_client, :paths) |> Map.get(:registry))
     argv = ["build-registry"]
     assert Devnode.Client.CLI.main(argv) == "The `build-registry` command will only replace an existing registry if the `--force` option is specified\n"
   end
 
   test "when registry exists, build-registry replaces registry, if `force` option is specified", %{test_project: project} do
-    File.mkdir_p(Application.get_env(:paths, :registry))
+    File.mkdir_p(Application.get_env(:devnode_client, :paths) |> Map.get(:registry))
     argv = ["build-registry", "-f"]
 
     expected = "192.168.10.10    registry"

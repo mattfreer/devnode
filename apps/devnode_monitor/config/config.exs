@@ -8,9 +8,9 @@ use Mix.Config
 # if you want to provide default values for your application for third-
 # party users, it should be done in your mix.exs file.
 
-config :paths, [
+config :devnode_monitor, :paths, %{
   stash: Path.expand("devnode/node_stash", System.tmp_dir)
-]
+}
 
 if Path.expand("#{Mix.env}.exs", __DIR__) |> File.exists? do
   import_config "#{Mix.env}.exs"

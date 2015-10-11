@@ -8,6 +8,3 @@ use Mix.Config
 # if you want to provide default values for your application for third-
 # party users, it should be done in your mix.exs file.
 
-config :paths, [
-  image_repo: Path.expand("devnode_test/image_repo", System.tmp_dir)
-]

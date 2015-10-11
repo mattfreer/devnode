@@ -1,6 +1,6 @@
 defmodule Devnode.Client.RuntimeConfig do
   def path do
-    case Application.get_env(:paths, :runtime_config) do
+    case Application.get_env(:devnode_client, :paths) |> Map.get(:runtime_config) do
       nil -> Path.expand(".devnoderc", elem(File.cwd, 1))
       path -> path
     end

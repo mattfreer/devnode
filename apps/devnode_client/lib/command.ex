@@ -104,7 +104,7 @@ defmodule Devnode.Client.Command do
 
   @spec registry_path() :: result_monad
   defp registry_path() do
-    Result.wrap(Application.get_env(:paths, :registry))
+    Result.wrap(Application.get_env(:devnode_client, :paths) |> Map.get(:registry))
   end
 
   @spec registry_credentials(result_monad, boolean) :: result_monad
@@ -112,7 +112,7 @@ defmodule Devnode.Client.Command do
     bind(result, fn(registry_path) ->
       Result.ok(%{
         name: "registry",
-        ip: Application.get_env(:ips, :registry),
+        ip: Application.get_env(:devnode_client, :ips) |> Map.get(:registry),
         override: force,
         path: registry_path
       })
