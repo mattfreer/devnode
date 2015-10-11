@@ -37,7 +37,8 @@ defmodule Devnode.Monitor.NodeList do
   end
 
   defp next_ip(nodes) do
-    "#{ @ip_range }.#{ last_host(nodes) + 1 }"
+    host = last_host(nodes) + 1
+    "#{ @ip_range }.#{ Integer.to_string(host) }"
   end
 
   defp last_host(nodes) do

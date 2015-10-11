@@ -26,7 +26,7 @@ defmodule Devnode.Monitor.NodePort do
   end
 
   defp free_port?(port) do
-    case System.cmd("lsof", ["-iTCP:#{port}"], stderr_to_stdout: true) do
+    case System.cmd("lsof", ["-iTCP:#{Integer.to_string(port)}"], stderr_to_stdout: true) do
       {"", 1} -> true
       {_output, 0} -> false
     end

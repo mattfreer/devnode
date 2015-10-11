@@ -25,8 +25,8 @@ defmodule Devnode.Client do
 
   defp connect_to_cluster do
     case Node.connect(monitor_name) do
-      :ignored -> {:error, "#{monitor_name} is not started"}
-      false -> {:error, "Failed to connect to #{monitor_name}"}
+      :ignored -> {:error, "#{monitor_name |> Atom.to_string} is not started"}
+      false -> {:error, "Failed to connect to #{monitor_name |> Atom.to_string}"}
       true -> {:ok, "connected to cluster"}
     end
   end
