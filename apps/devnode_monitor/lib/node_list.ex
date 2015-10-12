@@ -2,15 +2,18 @@ defmodule Devnode.Monitor.NodeList do
   defstruct entries: %{}
 
   import Devnode.Monitor.NodePort, only: [next_free_port: 1, highest_port: 1]
+  alias Devnode.Monitor.Node
 
-  @type t :: %__MODULE__{:entries => Dict.t}
+  @type nodes :: %{atom => Devnode.Monitor.Node.t}
+  @type t :: %__MODULE__{:entries => nodes}
   @ip_range "192.168.124"
 
   def new() do
     %Devnode.Monitor.NodeList{}
   end
 
-  def add_entry(%Devnode.Monitor.NodeList{entries: entries} = node_list, entry) do
+  @spec add_entry(__MODULE__.t, Node.t) :: Node.t | {:error, String.t}
+  def add_entry(%Devnode.Monitor.NodeList{} = node_list, entry) do
     case validate_entry(node_list, entry) do
       {:ok, entry} -> add(node_list, entry)
       error -> error

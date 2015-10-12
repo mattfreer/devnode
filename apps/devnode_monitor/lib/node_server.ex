@@ -1,6 +1,8 @@
 defmodule Devnode.Monitor.NodeServer do
   use GenServer
   alias Devnode.Monitor.NodeList, as: NodeList
+  alias Devnode.Monitor.Node
+
 
   # Client
   def start_link() do
@@ -8,7 +10,7 @@ defmodule Devnode.Monitor.NodeServer do
   end
 
   def add_entry(node_server, name, image) do
-    GenServer.call(node_server, {:add_entry, %{name: name, image: image}})
+    GenServer.call(node_server, {:add_entry, %Node{name: name, image: image}})
   end
 
   def entries(node_server) do
