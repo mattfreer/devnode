@@ -23,7 +23,7 @@ defmodule Devnode.Client.Command do
       includes?(list, "build-registry") -> &build_registry/1
 
       true ->
-        fn(_values) -> "no match" end
+        fn(_values) -> error("no match") end
     end
   end
 
@@ -31,25 +31,24 @@ defmodule Devnode.Client.Command do
     Enum.any?(list, fn(x) -> x == str end)
   end
 
+  @spec list_nodes(Keyword.t) :: result_monad
   defp list_nodes(_values) do
-    Devnode.Client.Node.list
+    result = Devnode.Client.Node.list
     |> Map.values
     |> Enum.map(fn(i) -> Map.values(i) end)
     |> Table.format(padding: 4)
+
+    ok(result)
   end
 
+  @spec build_node(Keyword.t) :: result_monad
   defp build_node(values) do
-    node = requires_runtime_config(&ImageRepo.dir/0)
+    requires_runtime_config(&ImageRepo.dir/0)
     |> images
     |> get_image_selection
     |> valid_image_selection?
     |> scaffold_node(Keyword.get(values, :name))
     |> node_summary
-
-    case node do
-      {:ok, n} -> n
-      {:error, msg} -> raise msg
-    end
   end
 
   @spec images(result_monad) :: result_monad
@@ -92,16 +91,12 @@ defmodule Devnode.Client.Command do
     end
   end
 
+  @spec build_registry(Keyword.t) :: result_monad
   defp build_registry(values) do
-    registry = registry_path
+    registry_path
     |> registry_credentials(Keyword.get(values, :force))
     |> scaffold_registry
     |> registry_summary
-
-    case registry do
-      {:ok, credentials} -> credentials
-      {:error, msg} -> raise msg
-    end
   end
 
   @spec registry_path() :: result_monad

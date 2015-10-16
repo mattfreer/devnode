@@ -22,20 +22,16 @@ defmodule Devnode.Client.CLI do
   end
 
   defp build_response(options) do
-    Process.flag(:trap_exit, true)
-
-    %Task{pid: pid, ref: ref} = Task.async(fn ->
-      {:result, Devnode.Client.Command.execute(options)}
-    end)
-
-    receive do
-      {:EXIT, _pid, reason } -> receive_exit(reason, elem(options, 1))
-      {ref, {:result, data}} -> data
-    end
+    task = Task.async(fn -> Devnode.Client.Command.execute(options) end)
+    result(Task.await(task), elem(options,1))
   end
 
-  defp receive_exit({ %RuntimeError{} = error, _}, cmds) do
-    Help.msg(cmds, Map.get(error, :message))
+  defp result({:ok, msg}, _cmds) do
+    msg
+  end
+
+  defp result({:error, msg}, cmds) do
+    Help.msg(cmds, msg)
   end
 
   defp respond(device \\ :erlang.group_leader(), response) do

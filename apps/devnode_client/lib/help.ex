@@ -1,4 +1,10 @@
 defmodule Devnode.Client.Help do
+  def msg([cmd], "no match" <> _rest) do
+    """
+    The `#{cmd}` command has not been recognised
+    """
+  end
+
   def msg([cmd], "Requires runtime config" <> _rest) do
     requires_runtime_config(cmd)
   end
