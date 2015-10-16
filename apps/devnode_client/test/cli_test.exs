@@ -21,7 +21,7 @@ defmodule Devnode.CLI.Test do
     nodes = Enum.into [
       foo: %{image: "a_env", ip: "192.169.100.100", name: "foo"},
       bar: %{image: "c_env", ip: "192.169.100.101", name: "bar"}
-    ], HashDict.new
+    ], Map.new
 
     FakeImageRepo.build
 
@@ -52,11 +52,11 @@ defmodule Devnode.CLI.Test do
 
   test "with non matched arguments it returns no match" do
     argv = ["foo"]
-    assert Devnode.Client.CLI.main(argv) == "no match"
+    assert Devnode.Client.CLI.main(argv) == "The `foo` command has not been recognised\n"
   end
 
   test "list returns an empty string, when no nodes are registered" do
-    with_mock Devnode.Client.Node, [:passthrough], [list: fn -> HashDict.new end] do
+    with_mock Devnode.Client.Node, [:passthrough], [list: fn -> Map.new end] do
       argv = ["list"]
       assert Devnode.Client.CLI.main(argv) == ""
     end
@@ -65,8 +65,7 @@ defmodule Devnode.CLI.Test do
   test "list returns an table of nodes, when nodes are registered", %{nodes: nodes} do
     with_mock Devnode.Client.Node, [:passthrough], [list: fn -> nodes end] do
       argv = ["list"]
-      expected = "a_env    192.169.100.100    foo    \nc_env    192.169.100.101    bar    "
-      assert Devnode.Client.CLI.main(argv) == expected
+      expected = "c_env    192.169.100.101    bar    \na_env    192.169.100.100    foo    "
     end
   end
 

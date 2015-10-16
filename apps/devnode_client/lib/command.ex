@@ -33,7 +33,7 @@ defmodule Devnode.Client.Command do
 
   defp list_nodes(_values) do
     Devnode.Client.Node.list
-    |> HashDict.values
+    |> Map.values
     |> Enum.map(fn(i) -> Map.values(i) end)
     |> Table.format(padding: 4)
   end
