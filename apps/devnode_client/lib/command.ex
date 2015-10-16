@@ -84,7 +84,7 @@ defmodule Devnode.Client.Command do
   end
 
   @spec requires_runtime_config(any) :: result_monad
-  defp requires_runtime_config(any \\ "") do
+  defp requires_runtime_config(any) do
     if RuntimeConfig.exists? do
       ok(any.());
     else
