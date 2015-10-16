@@ -20,7 +20,7 @@ defmodule Devnode.Monitor.NodeList do
     end
   end
 
-  def get(%Devnode.Monitor.NodeList{entries: entries} = node_list, key) do
+  def get(%Devnode.Monitor.NodeList{entries: entries}, key) do
     Map.get(entries, key)
   end
 
@@ -44,6 +44,7 @@ defmodule Devnode.Monitor.NodeList do
     "#{ @ip_range }.#{ Integer.to_string(host) }"
   end
 
+  @spec last_host(nodes) :: integer
   defp last_host(nodes) do
     if (Enum.count(nodes) > 0) do
       nodes
