@@ -4,7 +4,7 @@ defmodule Devnode.Monitor.NodePort do
 
   alias Devnode.Monitor.NodePortError
 
-  @spec next_free_port(pos_integer) :: number
+  @spec next_free_port(pos_integer) :: integer
   def next_free_port(start = @max_port) do
     raise NodePortError
   end
