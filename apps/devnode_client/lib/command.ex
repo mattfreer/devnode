@@ -43,12 +43,51 @@ defmodule Devnode.Client.Command do
 
   @spec build_node(Keyword.t) :: result_monad
   defp build_node(values) do
-    requires_runtime_config(&ImageRepo.dir/0)
-    |> images
-    |> get_image_selection
-    |> valid_image_selection?
-    |> scaffold_node(Keyword.get(values, :name))
+    node_credentials(values)
+    |> scaffold_node
     |> node_summary
+  end
+
+  @spec node_credentials(Keyword.t) :: result_monad
+  defp node_credentials(options) do
+    ok(%{})
+    |> add_name(options)
+    |> add_image
+  end
+
+  @spec add_image(result_monad) :: result_monad
+  defp add_image(result) do
+    bind(result, fn(credentials) ->
+      requires_runtime_config(&ImageRepo.dir/0)
+      |> images
+      |> image_selection
+      |> validate_image_selection
+      |> add_to_credentials(credentials)
+    end)
+  end
+
+  @spec add_name(result_monad, Keyword.t) :: result_monad
+  defp add_name(result, options) do
+    bind(result, fn(credentials) ->
+      node_name(options)
+      |> add_to_credentials(credentials)
+    end)
+  end
+
+  @spec node_name(Keyword.t) :: result_monad
+  defp node_name(options) do
+    if Keyword.has_key?(options, :name) do
+      ok(%{name: Keyword.get(options, :name)});
+    else
+      error("Requires `--name` option.");
+    end
+  end
+
+  @spec add_to_credentials(result_monad, Map.t) :: result_monad
+  defp add_to_credentials(result, credentials) do
+    bind(result, fn(map) ->
+      Result.ok(Map.merge(credentials, map))
+    end)
   end
 
   @spec images(result_monad) :: result_monad
@@ -58,8 +97,8 @@ defmodule Devnode.Client.Command do
     end)
   end
 
-  @spec get_image_selection(result_monad) :: result_monad
-  defp get_image_selection(list) do
+  @spec image_selection(result_monad) :: result_monad
+  defp image_selection(list) do
     bind(list, fn(images) ->
       case ask_build_question(images) do
         "" -> error("No image specified.");
@@ -68,14 +107,14 @@ defmodule Devnode.Client.Command do
     end)
   end
 
-  @spec valid_image_selection?(result_monad) :: result_monad
-  defp valid_image_selection?(result) do
+  @spec validate_image_selection(result_monad) :: result_monad
+  defp validate_image_selection(result) do
     bind(result, fn(map) ->
       list = Map.get(map, :list)
       image = Map.get(map, :selection)
 
       if Enum.member?(list, image) do
-        ok(image)
+        ok(%{image: image})
       else
         error("The image named '#{image}', is not available.")
       end
@@ -131,10 +170,12 @@ defmodule Devnode.Client.Command do
     end)
   end
 
-  @spec scaffold_node(result_monad, String.t) :: result_monad
-  defp scaffold_node(result, name) do
-    bind(result, fn(image) ->
-      NodeScaffold.build(FileHelper.cwd, Node.new(name, image))
+  @spec scaffold_node(result_monad) :: result_monad
+  defp scaffold_node(result) do
+    bind(result, fn(credentials) ->
+      values = Map.to_list(credentials) |> Keyword.values |> Enum.reverse
+      node = apply(Node, :new, values)
+      NodeScaffold.build(FileHelper.cwd, node)
     end)
   end
 

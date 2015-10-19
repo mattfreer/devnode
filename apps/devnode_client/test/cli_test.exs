@@ -69,9 +69,17 @@ defmodule Devnode.CLI.Test do
     end
   end
 
-  test "build returns help content if no image name is specfied", %{test_project: project} do
+  test "build returns help content if no name is specfied", %{test_project: project} do
     with_build_mocks(%{project: project, image: ""}, fn ->
       argv = ["build"]
+      assert Devnode.Client.CLI.main(argv) ==
+      "Requires `--name` option.\nThe `build` command should be used as follows:\nbuild --name=node_name\n\n"
+    end)
+  end
+
+  test "build returns help content if no image is specfied", %{test_project: project} do
+    with_build_mocks(%{project: project, image: ""}, fn ->
+      argv = ["build", "-n=my_node_name"]
       assert Devnode.Client.CLI.main(argv) ==
       "No image specified.\nThe `build` command should be used as follows:\nbuild --name=node_name\n\n"
     end)
@@ -79,7 +87,7 @@ defmodule Devnode.CLI.Test do
 
   test "build requires runtime config" do
     with_mock Devnode.Client.RuntimeConfig, [:passthrough], [ exists?: fn -> false end] do
-      argv = ["build"]
+      argv = ["build", "-n=my_node_name"]
       assert Devnode.Client.CLI.main(argv) ==
       "The `build` command requires a `.devnoderc` config file to be present in the current working directory\n"
     end
