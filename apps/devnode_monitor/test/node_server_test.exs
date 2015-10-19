@@ -28,8 +28,8 @@ defmodule Devnode.Monitor.NodeSereverTest do
 
   test "when server is restarted it maintains state" do
     pid = :global.whereis_name(NodeServer)
-    NodeServer.add_entry(pid, "a", "foo")
-    NodeServer.add_entry(pid, "b", "bar")
+    NodeServer.add_entry(pid, %{name: "a", image: "foo"})
+    NodeServer.add_entry(pid, %{name: "b", image: "bar"})
 
     GenServer.cast(pid, :bad_cast)
     :timer.sleep 1000
@@ -42,7 +42,7 @@ defmodule Devnode.Monitor.NodeSereverTest do
 
   test "new nodes are named and added to GenServer state" do
     pid = :global.whereis_name(NodeServer)
-    node1 = NodeServer.add_entry(pid, "foo", "bar")
+    node1 = NodeServer.add_entry(pid, %{name: "foo", image: "bar"})
     assert %{ip: _, name: _} = node1
 
     nodes = NodeServer.entries(pid)
@@ -53,9 +53,9 @@ defmodule Devnode.Monitor.NodeSereverTest do
 
   test "node names must be unique" do
     pid = :global.whereis_name(NodeServer)
-    node1 = NodeServer.add_entry(pid, "foo", "bar")
+    node1 = NodeServer.add_entry(pid, %{name: "foo", image: "bar"})
     assert %{ip: _, name: _} = node1
-    node2 = NodeServer.add_entry(pid, "foo", "bar")
+    node2 = NodeServer.add_entry(pid, %{name: "foo", image: "bar"})
     assert {:error, "node names must be unique, foo is already in use"} == node2
   end
 end

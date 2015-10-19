@@ -173,9 +173,7 @@ defmodule Devnode.Client.Command do
   @spec scaffold_node(result_monad) :: result_monad
   defp scaffold_node(result) do
     bind(result, fn(credentials) ->
-      values = Map.to_list(credentials) |> Keyword.values |> Enum.reverse
-      node = apply(Node, :new, values)
-      NodeScaffold.build(FileHelper.cwd, node)
+      NodeScaffold.build(FileHelper.cwd, Node.new(credentials))
     end)
   end
 

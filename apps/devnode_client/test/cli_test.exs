@@ -37,7 +37,7 @@ defmodule Devnode.CLI.Test do
       cwd: fn -> Map.get(options.project, :path) end] do
 
       with_mock Devnode.Client.Node, [:passthrough], [
-        new: fn(name, image) -> %{image: image, name: name, ip: "192.100.100.100", port: "7001"} end] do
+        new: fn(%{image: image, name: name}) -> %{image: image, name: name, ip: "192.100.100.100", port: "7001"} end] do
 
         with_mock IO, [:passthrough], [ gets: fn(msg) -> options.image end] do
           fun.()

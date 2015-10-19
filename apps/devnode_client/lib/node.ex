@@ -1,6 +1,6 @@
 defmodule Devnode.Client.Node do
-  def new(name, image) do
-    :rpc.call(monitor_node, Devnode.Monitor.NodeServer, :add_entry, [monitor_pid, name, image])
+  def new(credentials) do
+    :rpc.call(monitor_node, Devnode.Monitor.NodeServer, :add_entry, [monitor_pid, credentials])
   end
 
   def list do

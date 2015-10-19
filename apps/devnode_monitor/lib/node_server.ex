@@ -3,14 +3,13 @@ defmodule Devnode.Monitor.NodeServer do
   alias Devnode.Monitor.NodeList, as: NodeList
   alias Devnode.Monitor.Node
 
-
   # Client
   def start_link() do
     GenServer.start_link(__MODULE__, nil, name: {:global, __MODULE__})
   end
 
-  def add_entry(node_server, name, image) do
-    GenServer.call(node_server, {:add_entry, %Node{name: name, image: image}})
+  def add_entry(node_server, credentials) do
+    GenServer.call(node_server, {:add_entry, Map.merge(%Node{}, credentials)})
   end
 
   def entries(node_server) do
