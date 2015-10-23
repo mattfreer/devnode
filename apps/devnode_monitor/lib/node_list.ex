@@ -2,7 +2,7 @@ defmodule Devnode.Monitor.NodeList do
   defstruct entries: %{}
 
   import Devnode.Monitor.NodePort, only: [next_free_port: 1, highest_port: 1]
-  alias Devnode.Monitor.Node
+  alias Devnode.Node
 
   @type nodes :: %{atom => Devnode.Monitor.Node.t}
   @type t :: %__MODULE__{:entries => nodes}

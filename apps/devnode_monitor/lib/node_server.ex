@@ -1,7 +1,7 @@
 defmodule Devnode.Monitor.NodeServer do
   use GenServer
   alias Devnode.Monitor.NodeList, as: NodeList
-  alias Devnode.Monitor.Node
+  alias Devnode.Node
 
   # Client
   def start_link() do

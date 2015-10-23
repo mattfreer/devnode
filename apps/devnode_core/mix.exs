@@ -1,21 +1,22 @@
-defmodule Devnode.Monitor.Mixfile do
+defmodule DevnodeCore.Mixfile do
   use Mix.Project
 
   def project do
-    [app: :devnode_monitor,
+    [app: :devnode_core,
      version: "0.0.1",
      deps_path: "../../deps",
      lockfile: "../../mix.lock",
-     elixir: "~> 1.0",
+     elixir: "~> 1.1",
+     build_embedded: Mix.env == :prod,
+     start_permanent: Mix.env == :prod,
      deps: deps]
   end
 
   # Configuration for the OTP application
   #
-  # Type `mix help compile.app` for more information
+  # Type "mix help compile.app" for more information
   def application do
-    [applications: [:logger],
-     mod: {Devnode.Monitor, []}]
+    [applications: [:logger]]
   end
 
   # Dependencies can be Hex packages:
@@ -30,12 +31,8 @@ defmodule Devnode.Monitor.Mixfile do
   #
   #   {:myapp, in_umbrella: true}
   #
-  # Type `mix help deps` for more examples and options
+  # Type "mix help deps" for more examples and options
   defp deps do
-    [
-      {:devnode_core, in_umbrella: true},
-      {:devnode_support, in_umbrella: true, only: [:test]},
-      {:mock, "~> 0.1.0"}
-    ]
+    []
   end
 end
