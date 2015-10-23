@@ -4,7 +4,7 @@ defmodule Devnode.Client.Command do
   alias Devnode.Client.NodeScaffold
   alias Devnode.Client.RegistryScaffold
   alias Devnode.Client.RuntimeConfig
-  alias Devnode.Client.Node
+  alias Devnode.Client.NodeServerProxy
 
   @build_question "Please specify the image that you wish to use:"
   use Towel
@@ -33,7 +33,7 @@ defmodule Devnode.Client.Command do
 
   @spec list_nodes(Keyword.t) :: result_monad
   defp list_nodes(_values) do
-    result = Devnode.Client.Node.list
+    result = NodeServerProxy.list
     |> Map.values
     |> Enum.map(fn(i) -> Map.from_struct(i) |> Map.values end)
     |> Table.format(padding: 4)
@@ -173,7 +173,7 @@ defmodule Devnode.Client.Command do
   @spec scaffold_node(result_monad) :: result_monad
   defp scaffold_node(result) do
     bind(result, fn(credentials) ->
-      NodeScaffold.build(FileHelper.cwd, Node.new(credentials))
+      NodeScaffold.build(FileHelper.cwd, NodeServerProxy.new(credentials))
     end)
   end
 

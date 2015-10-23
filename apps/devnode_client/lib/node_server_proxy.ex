@@ -1,4 +1,4 @@
-defmodule Devnode.Client.Node do
+defmodule Devnode.Client.NodeServerProxy do
   def new(credentials) do
     :rpc.call(monitor_node, Devnode.Monitor.NodeServer, :add_entry, [monitor_pid, credentials])
   end

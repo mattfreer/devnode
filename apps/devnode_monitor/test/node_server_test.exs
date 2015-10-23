@@ -1,4 +1,4 @@
-defmodule Devnode.Monitor.NodeSereverTest do
+defmodule Devnode.Monitor.NodeServerTest do
   use ExUnit.Case
   alias Devnode.Monitor.NodeServer
   alias Devnode.Support.TestDir

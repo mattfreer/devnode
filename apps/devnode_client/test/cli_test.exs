@@ -36,7 +36,7 @@ defmodule Devnode.CLI.Test do
     with_mock Devnode.Client.FileHelper, [:passthrough], [
       cwd: fn -> Map.get(options.project, :path) end] do
 
-      with_mock Devnode.Client.Node, [:passthrough], [
+      with_mock Devnode.Client.NodeServerProxy, [:passthrough], [
         new: fn(%{image: image, name: name}) -> %{image: image, name: name, ip: "192.100.100.100", port: "7001"} end] do
 
         with_mock IO, [:passthrough], [ gets: fn(msg) -> options.image end] do
@@ -56,14 +56,14 @@ defmodule Devnode.CLI.Test do
   end
 
   test "list returns an empty string, when no nodes are registered" do
-    with_mock Devnode.Client.Node, [:passthrough], [list: fn -> Map.new end] do
+    with_mock Devnode.Client.NodeServerProxy, [:passthrough], [list: fn -> Map.new end] do
       argv = ["list"]
       assert Devnode.Client.CLI.main(argv) == ""
     end
   end
 
   test "list returns an table of nodes, when nodes are registered", %{nodes: nodes} do
-    with_mock Devnode.Client.Node, [:passthrough], [list: fn -> nodes end] do
+    with_mock Devnode.Client.NodeServerProxy, [:passthrough], [list: fn -> nodes end] do
       argv = ["list"]
       assert Devnode.Client.CLI.main(argv) ==
       "c_env    192.169.100.101    bar    7002    \na_env    192.169.100.100    foo    7001    "
