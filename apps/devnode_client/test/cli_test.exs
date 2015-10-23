@@ -19,8 +19,8 @@ defmodule Devnode.CLI.Test do
     }
 
     nodes = Enum.into [
-      foo: %{image: "a_env", ip: "192.169.100.100", name: "foo"},
-      bar: %{image: "c_env", ip: "192.169.100.101", name: "bar"}
+      foo: %Devnode.Node{image: "a_env", ip: "192.169.100.100", name: "foo", port: "7001"},
+      bar: %Devnode.Node{image: "c_env", ip: "192.169.100.101", name: "bar", port: "7002"}
     ], Map.new
 
     FakeImageRepo.build
@@ -65,7 +65,8 @@ defmodule Devnode.CLI.Test do
   test "list returns an table of nodes, when nodes are registered", %{nodes: nodes} do
     with_mock Devnode.Client.Node, [:passthrough], [list: fn -> nodes end] do
       argv = ["list"]
-      expected = "c_env    192.169.100.101    bar    \na_env    192.169.100.100    foo    "
+      assert Devnode.Client.CLI.main(argv) ==
+      "c_env    192.169.100.101    bar    7002    \na_env    192.169.100.100    foo    7001    "
     end
   end
 

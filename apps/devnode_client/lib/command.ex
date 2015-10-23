@@ -35,7 +35,7 @@ defmodule Devnode.Client.Command do
   defp list_nodes(_values) do
     result = Devnode.Client.Node.list
     |> Map.values
-    |> Enum.map(fn(i) -> Map.values(i) end)
+    |> Enum.map(fn(i) -> Map.from_struct(i) |> Map.values end)
     |> Table.format(padding: 4)
 
     ok(result)
