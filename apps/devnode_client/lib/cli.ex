@@ -23,7 +23,7 @@ defmodule Devnode.Client.CLI do
 
   defp build_response(options) do
     task = Task.async(fn -> Devnode.Client.Command.execute(options) end)
-    result(Task.await(task), elem(options,1))
+    result(Task.await(task, :infinity), elem(options,1))
   end
 
   defp result({:ok, msg}, _cmds) do
