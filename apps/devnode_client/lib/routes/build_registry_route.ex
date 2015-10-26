@@ -13,7 +13,7 @@ defmodule Devnode.Client.BuildRegistryRoute do
 
   @spec registry_path() :: Types.result_monad
   defp registry_path() do
-    Result.wrap(Application.get_env(:devnode_client, :paths) |> Map.get(:registry))
+    registry_config(:paths) |> Result.wrap
   end
 
   @spec registry_credentials(Types.result_monad, boolean) :: Types.result_monad
@@ -21,7 +21,7 @@ defmodule Devnode.Client.BuildRegistryRoute do
     bind(result, fn(registry_path) ->
       Result.ok(%{
         name: "registry",
-        ip: Application.get_env(:devnode_client, :ips) |> Map.get(:registry),
+        ip: registry_config(:ips),
         override: force,
         path: registry_path
       })
@@ -41,6 +41,11 @@ defmodule Devnode.Client.BuildRegistryRoute do
     bind(result, fn(credentials) ->
       Result.wrap("#{ Map.get(credentials, :ip) }    #{ Map.get(credentials, :name) }")
     end)
+  end
+
+  @spec registry_config(atom) :: String.t
+  defp registry_config(key) do
+    Application.get_env(:devnode_client, key) |> Map.get(:registry)
   end
 end
 
