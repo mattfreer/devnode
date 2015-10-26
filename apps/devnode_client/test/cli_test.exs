@@ -86,6 +86,16 @@ defmodule Devnode.CLI.Test do
     end)
   end
 
+  test "build returns help content if a duplicate name is specfied", %{test_project: project, nodes: nodes} do
+    with_mock Devnode.Client.NodeServerProxy, [:passthrough], [list: fn -> nodes end] do
+      with_mock IO, [:passthrough], [ gets: fn(msg) -> "a_env" end] do
+        argv = ["build", "-n=foo"]
+        assert Devnode.Client.CLI.main(argv) ==
+        "Node names must be unique, 'foo' is already in use\nThe `build` command should be used as follows:\nbuild --name=node_name\n\n"
+      end
+    end
+  end
+
   test "build requires runtime config" do
     with_mock Devnode.Client.RuntimeConfig, [:passthrough], [ exists?: fn -> false end] do
       argv = ["build", "-n=my_node_name"]

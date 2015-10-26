@@ -44,6 +44,7 @@ defmodule Devnode.Client.Command do
   @spec build_node(Keyword.t) :: result_monad
   defp build_node(values) do
     node_credentials(values)
+    |> register_node
     |> scaffold_node
     |> node_summary
   end
@@ -170,10 +171,17 @@ defmodule Devnode.Client.Command do
     end)
   end
 
+  @spec register_node(result_monad) :: result_monad
+  defp register_node(result) do
+    bind(result, fn(credentials) ->
+      NodeServerProxy.new(credentials) |> Result.wrap
+    end)
+  end
+
   @spec scaffold_node(result_monad) :: result_monad
   defp scaffold_node(result) do
     bind(result, fn(credentials) ->
-      NodeScaffold.build(FileHelper.cwd, NodeServerProxy.new(credentials))
+      NodeScaffold.build(FileHelper.cwd, credentials)
     end)
   end
 

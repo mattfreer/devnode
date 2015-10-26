@@ -56,6 +56,6 @@ defmodule Devnode.Monitor.NodeServerTest do
     node1 = NodeServer.add_entry(pid, %{name: "foo", image: "bar"})
     assert %{ip: _, name: _} = node1
     node2 = NodeServer.add_entry(pid, %{name: "foo", image: "bar"})
-    assert {:error, "node names must be unique, foo is already in use"} == node2
+    assert {:error, "Node names must be unique, 'foo' is already in use"} == node2
   end
 end

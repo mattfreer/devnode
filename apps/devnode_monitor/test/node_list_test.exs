@@ -17,6 +17,6 @@ defmodule Devnode.Monitor.NodeListTest do
     list = NodeList.new()
     |> NodeList.add_entry(%{name: "foo"})
 
-    assert NodeList.add_entry(list, %{name: "foo"}) == {:error, "node names must be unique, foo is already in use"}
+    assert NodeList.add_entry(list, %{name: "foo"}) == {:error, "Node names must be unique, 'foo' is already in use"}
   end
 end

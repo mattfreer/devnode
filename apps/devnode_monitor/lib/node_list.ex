@@ -26,7 +26,7 @@ defmodule Devnode.Monitor.NodeList do
 
   defp validate_entry(list, entry) do
     case Map.has_key?(Map.get(list, :entries), Map.get(entry, :name)) do
-      true -> {:error, "node names must be unique, #{ Map.get(entry, :name) } is already in use"}
+      true -> {:error, "Node names must be unique, '#{ Map.get(entry, :name) }' is already in use"}
       false -> {:ok, entry}
     end
   end
