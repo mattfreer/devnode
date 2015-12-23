@@ -4,6 +4,7 @@ defmodule Devnode.Client.BuildRoute do
   alias Devnode.Client.RuntimeConfig
   alias Devnode.Client.NodeServerProxy
   alias Devnode.Client.FileHelper
+  alias Devnode.Client.RouteValidation
   alias Devnode.Types
 
   @build_question "Please specify the image that you wish to use:"
@@ -27,8 +28,13 @@ defmodule Devnode.Client.BuildRoute do
 
   @spec add_image(Types.result_monad) :: Types.result_monad
   defp add_image(result) do
+    validations = [
+      &RuntimeConfig.exists?/0,
+      &ImageRepo.exists?/0
+    ]
+
     bind(result, fn(credentials) ->
-      requires_runtime_config(&ImageRepo.dir/0)
+      RouteValidation.validate(validations)
       |> images
       |> image_selection
       |> validate_image_selection
@@ -62,8 +68,8 @@ defmodule Devnode.Client.BuildRoute do
 
   @spec images(Types.result_monad) :: Types.result_monad
   defp images(result) do
-    bind(result, fn(path) ->
-      ok(ImageRepo.list(path))
+    bind(result, fn(_) ->
+      ok(ImageRepo.list(ImageRepo.dir))
     end)
   end
 
@@ -89,15 +95,6 @@ defmodule Devnode.Client.BuildRoute do
         error("The image named '#{image}', is not available.")
       end
     end)
-  end
-
-  @spec requires_runtime_config((... -> any)) :: Types.result_monad
-  defp requires_runtime_config(f) do
-    if RuntimeConfig.exists? do
-      ok(f.());
-    else
-      error("Requires runtime config");
-    end
   end
 
   @spec register_node(Types.result_monad) :: Types.result_monad

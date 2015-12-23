@@ -1,11 +1,17 @@
 defmodule Devnode.Client.Help do
+  alias Devnode.Client.ImageRepo
+
   def msg([cmd], "no match" <> _rest) do
     """
     The `#{cmd}` command has not been recognised
     """
   end
 
-  def msg([cmd], "Requires runtime config" <> _rest) do
+  def msg([cmd], "Devnode.Client.ImageRepo.exists?/0" <> _rest) do
+    requires_image_repo(cmd)
+  end
+
+  def msg([cmd], "Devnode.Client.RuntimeConfig.exists?/0" <> _rest) do
     requires_runtime_config(cmd)
   end
 
@@ -24,6 +30,12 @@ defmodule Devnode.Client.Help do
   def msg([cmd], "registry_exists") do
     """
     The `#{cmd}` command will only replace an existing registry if the `--force` option is specified
+    """
+  end
+
+  defp requires_image_repo(cmd) do
+    """
+    The `#{cmd}` command expects an image repository to be located at `#{ImageRepo.dir}`
     """
   end
 

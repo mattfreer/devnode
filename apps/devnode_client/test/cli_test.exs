@@ -186,5 +186,19 @@ defmodule Devnode.CLI.Test do
     expected = "192.168.10.10    registry"
     assert Devnode.Client.CLI.main(argv) == expected
   end
+
+  test "generate runtime-config scaffolds .devnoderc", %{test_project: project} do
+    with_mock Devnode.Client.FileHelper, [:passthrough], [
+      cwd: fn -> Map.get(project, :path) end] do
+
+      argv = ["generate", "runtime-config"]
+      Devnode.Client.CLI.main(argv)
+
+      assert File.exists?(Path.expand(".devnoderc", project.path)) == true
+
+      file_content(Path.expand(".devnoderc", project.path))
+      |> assert_file_content("dot_devnoderc.txt")
+    end
+  end
 end
 

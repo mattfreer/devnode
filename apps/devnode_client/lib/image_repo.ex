@@ -2,7 +2,15 @@ defmodule Devnode.Client.ImageRepo do
   alias Devnode.Client.RuntimeConfig
 
   def dir do
-    RuntimeConfig.image_repo_path
+    if RuntimeConfig.exists? do
+      RuntimeConfig.image_repo_path
+    else
+      Application.get_env(:devnode_client, :paths) |> Map.get(:image_repo)
+    end
+  end
+
+  def exists?(path \\ dir) do
+    File.exists?(path)
   end
 
   def list(dir) do

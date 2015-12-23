@@ -1,0 +1,2 @@
+image_repo:
+  path: /tmp/devnode_test/image_repo
