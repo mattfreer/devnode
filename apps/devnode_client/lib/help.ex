@@ -27,12 +27,6 @@ defmodule Devnode.Client.Help do
     |> add_details(details)
   end
 
-  def msg([cmd], "registry_exists") do
-    """
-    The `#{cmd}` command will only replace an existing registry if the `--force` option is specified
-    """
-  end
-
   defp requires_image_repo(cmd) do
     """
     The `#{cmd}` command expects an image repository to be located at `#{ImageRepo.dir}`.
