@@ -1,17 +1,23 @@
 defmodule Devnode.Client.Help do
-  def msg([cmd], "no match" <> _rest) do
+  alias Devnode.Client.ImageRepo
+
+  def msg([_head|_tail] = cmds, "no match" <> _rest) do
     """
-    The `#{cmd}` command has not been recognised
+    The `#{Enum.join(cmds, " ")}` command has not been recognised
     """
   end
 
-  def msg([cmd], "Requires runtime config" <> _rest) do
-    requires_runtime_config(cmd)
+  def msg([_head|_tail] = cmds, "Devnode.Client.ImageRepo.exists?/0" <> _rest) do
+    Enum.join(cmds, " ") |> requires_image_repo
   end
 
-  def msg([cmd], "Registry already exists" <> _rest) do
+  def msg([_head|_tail] = cmds, "Devnode.Client.RuntimeConfig.exists?/0" <> _rest) do
+    Enum.join(cmds, " ") |> requires_runtime_config
+  end
+
+  def msg([_head|_tail] = cmds, "Registry already exists" <> _rest) do
     """
-    The `#{cmd}` command will only replace an existing registry if the `--force` option is specified
+    The `#{Enum.join(cmds, " ")}` command will only replace an existing registry if the `--force` option is specified
     """
   end
 
@@ -24,6 +30,13 @@ defmodule Devnode.Client.Help do
   def msg([cmd], "registry_exists") do
     """
     The `#{cmd}` command will only replace an existing registry if the `--force` option is specified
+    """
+  end
+
+  defp requires_image_repo(cmd) do
+    """
+    The `#{cmd}` command expects an image repository to be located at `#{ImageRepo.dir}`.
+    The location for the image repository is specified in the `devnoderc` config file.
     """
   end
 

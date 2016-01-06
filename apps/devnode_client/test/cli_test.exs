@@ -104,6 +104,14 @@ defmodule Devnode.CLI.Test do
     end
   end
 
+  test "build requires an image registry" do
+    with_mock Devnode.Client.ImageRepo, [:passthrough], [ exists?: fn -> false end] do
+      argv = ["build", "-n=my_node_name"]
+      assert Devnode.Client.CLI.main(argv) ==
+      "The `build` command expects an image repository to be located at `/tmp/devnode_test/image_repo`.\nThe location for the image repository is specified in the `devnoderc` config file.\n"
+    end
+  end
+
   test "build returns new node credentials, when valid image is selected", %{test_project: project} do
     with_build_mocks(%{project: project, image: "a_env"}, fn ->
       argv = ["build", "-n=my_node_name"]
