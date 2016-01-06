@@ -194,5 +194,26 @@ defmodule Devnode.CLI.Test do
     expected = "192.168.10.10    registry"
     assert Devnode.Client.CLI.main(argv) == expected
   end
+
+  test "when image repo exists, generate runtime-config scaffolds .devnoderc", %{test_project: project} do
+    with_mock Devnode.Client.FileHelper, [:passthrough], [
+      cwd: fn -> Map.get(project, :path) end] do
+
+      argv = ["generate", "runtime-config"]
+      assert Devnode.Client.CLI.main(argv) == "The `devnoderc` file has been created in the current/working directory"
+
+      assert File.exists?(Path.expand(".devnoderc", project.path)) == true
+
+      file_content(Path.expand(".devnoderc", project.path))
+      |> assert_file_content("dot_devnoderc.txt")
+    end
+  end
+
+  test "when image repo doesn't exist, generate runtime-config returns help content", %{test_project: project} do
+    with_mock Devnode.Client.ImageRepo, [:passthrough], [ exists?: fn -> false end] do
+      argv = ["generate", "runtime-config"]
+      assert Devnode.Client.CLI.main(argv) == "The `generate runtime-config` command expects an image repository to be located at `/tmp/devnode_test/image_repo`.\nThe location for the image repository is specified in the `devnoderc` config file.\n"
+    end
+  end
 end
 

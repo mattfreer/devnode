@@ -43,6 +43,13 @@ devnode_client build -n=project_x
 
 ```
 
+##Runtime config
+Certain commands require configuration, this is done through the use of a `devnoderc` file that should be located within the current/working directory. This runtime config file contains settings such as the location on disc of the Docker registry. A template for the `devnoderc` file can be generated using the following command:
+```bash
+devnode_client generate runtime-config
+
+```
+
 ##Listing Development environments
 To view the credentials of all nodes that have been built the user can run the `list` command:
 ```bash

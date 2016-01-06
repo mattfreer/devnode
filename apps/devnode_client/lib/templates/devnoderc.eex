@@ -1,0 +1,2 @@
+image_repo:
+  path: <%= image_repo %>
