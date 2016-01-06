@@ -7,7 +7,7 @@ defmodule ConfigHelper do
 end
 
 config :devnode_client, :paths, %{
-  image_repo: Path.expand("devnode_test/image_repo", System.tmp_dir),
+  image_repo: "a/path/to/an/image/repo",
   registry: Path.expand("devnode_test/registry", System.tmp_dir),
   runtime_config: Path.expand("../test/support/files/dot_devnoderc.eex", __DIR__)
 }
